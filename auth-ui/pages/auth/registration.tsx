@@ -61,6 +61,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       await kratos.getSelfServiceRegistrationFlow(flow);
     // TODO: Redirect with error
     if (status !== 200) {
+      console.log(status)
       return {
         redirect: {
           destination: `/`,
@@ -75,6 +76,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     };
   } catch (e) {
+    console.log(e)
     return redirectOnSoftError(e, "/self-service/registration/browser");
   }
 }

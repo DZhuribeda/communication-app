@@ -20,7 +20,6 @@ switch ((process.env.SECURITY_MODE || '').toLowerCase()) {
 export default {
   kratos: {
     browser: browserUrl.replace(/\/+$/, ''),
-    admin: (process.env.KRATOS_ADMIN_URL || '').replace(/\/+$/, ''),
     public: publicUrl.replace(/\/+$/, ''),
   },
   baseUrl,
@@ -30,12 +29,4 @@ export default {
   securityMode,
   SECURITY_MODE_JWT,
   SECURITY_MODE_STANDALONE,
-
-  https: {
-    enabled:
-      process.env.hasOwnProperty('TLS_KEY_PATH') &&
-      process.env.hasOwnProperty('TLS_CERT_PATH'),
-    certificatePath: process.env.TLS_CERT_PATH || '',
-    keyPath: process.env.TLS_KEY_PATH || '',
-  },
 }
