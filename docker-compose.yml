@@ -10,6 +10,15 @@ services:
       - ./auth-ui:/app
     networks:
       - intranet
+  server:
+    build:
+      context: ./server
+    ports:
+      - 5000:5000
+    volumes:
+      - ./server:/app
+    networks:
+      - intranet
 
   kratos-migrate:
     image: oryd/kratos:v0.6.0-alpha.1-sqlite
@@ -58,6 +67,24 @@ services:
       - '4437:4437'
     networks:
       - intranet
+  
+  oathkeeper:
+    image: oryd/oathkeeper:v0.38
+    depends_on:
+      - kratos
+    ports:
+      - 4455:4455
+      - 4456:4456
+    command:
+      serve proxy -c "/etc/config/oathkeeper/oathkeeper.yml"
+    environment:
+      - LOG_LEVEL=debug
+    restart: on-failure
+    networks:
+      - intranet
+    volumes:
+      - ./oathkeeper:/etc/config/oathkeeper
+
 
 networks:
   intranet:
