@@ -6,20 +6,24 @@
     "license": "ISC",
     "description": "",
     "engines": {
-        "node": "14.x"
+        "node": "15.x"
     },
     "scripts": {
         "build": "tsc",
-        "run-build": "node build/src/index.js",
-        "start": "nodemon src/index.ts"
+        "start": "node build/src/index.js",
+        "dev": "nodemon src/index.ts"
     },
     "dependencies": {
+        "@ory/kratos-client": "^0.6.2-alpha.1",
         "body-parser": "^1.19.0",
         "bufferutil": "^4.0.3",
         "class-transformer": "^0.3.1",
         "class-validator": "^0.12.2",
         "cors": "^2.8.5",
+        "dotenv": "^9.0.2",
         "express": "^4.17.1",
+        "jsonwebtoken": "^8.5.1",
+        "jwks-rsa": "^2.0.3",
         "multer": "^1.4.2",
         "reflect-metadata": "^0.1.13",
         "routing-controllers": "^0.9.0",
@@ -30,6 +34,7 @@
         "@types/body-parser": "^1.19.0",
         "@types/cors": "^2.8.10",
         "@types/express": "^4.17.11",
+        "@types/jsonwebtoken": "^8.5.1",
         "@types/multer": "^1.4.5",
         "@types/node": "^14.14.21",
         "nodemon": "^2.0.7",
