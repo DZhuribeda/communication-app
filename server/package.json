@@ -14,7 +14,6 @@
         "dev": "nodemon src/index.ts"
     },
     "dependencies": {
-        "@ory/kratos-client": "^0.6.2-alpha.1",
         "body-parser": "^1.19.0",
         "bufferutil": "^4.0.3",
         "class-transformer": "^0.3.1",
@@ -28,7 +27,9 @@
         "reflect-metadata": "^0.1.13",
         "routing-controllers": "^0.9.0",
         "socket.io": "^4.0.0",
-        "utf-8-validate": "^5.0.4"
+        "typedi": "^0.10.0",
+        "utf-8-validate": "^5.0.4",
+        "winston": "^3.3.3"
     },
     "devDependencies": {
         "@types/body-parser": "^1.19.0",
