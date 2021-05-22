@@ -1,7 +1,5 @@
 version: v0.6.0-alpha.1
 
-dsn: memory
-
 serve:
   public:
     base_url: http://127.0.0.1:4455/.ory/kratos/public/
