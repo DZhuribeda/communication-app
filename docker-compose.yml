@@ -8,7 +8,14 @@ services:
       - 3000:3000
     volumes:
       - ./auth-ui:/app
-  server:
+  messages:
+    links:
+      - postgresd:postgresd
+    environment:
+      - DATABASE_URL=postgres://messages:secret@postgresd:5432/messages?sslmode=disable
+      - KETO_READ_URL=127.0.0.1:4466
+      - KETO_WRITE_URL=127.0.0.1:4467
+      - JWKS_URI=http://oathkeeper:4456/.well-known/jwks.json
     build:
       context: ./server
     ports:
@@ -103,6 +110,6 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_MULTIPLE_DATABASES=kratos,keto
+      - POSTGRES_MULTIPLE_DATABASES=kratos,keto,messages
       - POSTGRES_USER=superuser
       - POSTGRES_PASSWORD=secret

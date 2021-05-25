@@ -4,6 +4,9 @@ import jwks, { SigningKey } from "jwks-rsa";
 import jwt, { JwtHeader, SigningKeyCallback } from "jsonwebtoken";
 import { Logger, LoggerInterface } from "../decorators/logger";
 import { User } from "../interfaces/user";
+import { BaseRBACService } from "./rbac/rbac";
+import { ChannelsRBACService } from "./rbac/channels";
+import { splitRole } from "../utils/rbac";
 
 interface Session {
   id: string;
@@ -30,7 +33,13 @@ function getJwtKey(header: JwtHeader, callback: SigningKeyCallback) {
 
 @Service()
 export default class AuthService {
-  constructor(@Logger() private logger: LoggerInterface) {}
+  rbacService: BaseRBACService[];
+  constructor(
+    @Logger() private logger: LoggerInterface,
+    private channelsRBACService: ChannelsRBACService
+  ) {
+    this.rbacService = [this.channelsRBACService];
+  }
 
   private extractToken(authorization?: string) {
     if (!authorization) {
@@ -80,11 +89,32 @@ export default class AuthService {
     return this.extractUserFromToken(authHeader);
   }
 
-  public async authorize(authHeader?: string): Promise<boolean> {
-    const user = await this.extractUserFromToken(authHeader);
-    if (user) {
-      return true;
-    }
-    return false;
+  private async checkRoles(
+    userId: string,
+    resourceId: string,
+    roles: string[]
+  ): Promise<boolean> {
+    return (
+      await Promise.all(
+        roles.map((role) => {
+          const [namespace, action] = splitRole(role);
+          const service = this.rbacService.find(
+            (service) => service.namespace == namespace
+          );
+          if (!service) {
+            return false;
+          }
+          return service.isAllowedAction(resourceId, action, userId);
+        })
+      )
+    ).some((i) => i);
+  }
+
+  public async authorize(
+    userId: string,
+    resourceId: string,
+    roles: string[]
+  ): Promise<boolean> {
+    return this.checkRoles(userId, resourceId, roles);
   }
 }

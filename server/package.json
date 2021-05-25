@@ -15,6 +15,10 @@
     "test": "jest"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.3.2",
+    "@ory/keto-client": "^0.6.0-alpha.1",
+    "@ory/keto-grpc-client": "^0.6.0-alpha.1",
+    "@prisma/client": "^2.23.0",
     "body-parser": "^1.19.0",
     "bufferutil": "^4.0.3",
     "class-transformer": "^0.3.1",
@@ -43,6 +47,7 @@
     "jest": "^26.6.3",
     "nodemon": "^2.0.7",
     "prettier": "2.3.0",
+    "prisma": "^2.23.0",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   },
