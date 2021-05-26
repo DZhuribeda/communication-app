@@ -1,3 +1,4 @@
+import { Service } from "typedi";
 import { BaseRBACService } from "./rbac";
 
 export const CHANNEL_NAMESPACE = "channels";
@@ -15,6 +16,7 @@ export enum ChannelAction {
   READ = "READ",
 }
 
+@Service()
 export class ChannelsRBACService extends BaseRBACService {
   namespace = CHANNEL_NAMESPACE;
   actions = Object.values(ChannelAction);

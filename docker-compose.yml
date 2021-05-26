@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 
 services:
   auth-ui:
@@ -13,8 +13,8 @@ services:
       - postgresd:postgresd
     environment:
       - DATABASE_URL=postgres://messages:secret@postgresd:5432/messages?sslmode=disable
-      - KETO_READ_URL=127.0.0.1:4466
-      - KETO_WRITE_URL=127.0.0.1:4467
+      - KETO_READ_URL=http://keto:4466
+      - KETO_WRITE_URL=http://keto:4467
       - JWKS_URI=http://oathkeeper:4456/.well-known/jwks.json
     build:
       context: ./server
@@ -39,8 +39,8 @@ services:
       - kratos-migrate
     image: oryd/kratos:v0.6.3-alpha.1
     ports:
-      - '4433:4433' # public
-      - '4434:4434' # admin
+      - "4433:4433" # public
+      - "4434:4434" # admin
     restart: unless-stopped
     environment:
       - DSN=postgres://kratos:secret@postgresd:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4
@@ -54,9 +54,9 @@ services:
   mailslurper:
     image: oryd/mailslurper:latest-smtps
     ports:
-      - '4436:4436'
-      - '4437:4437'
-  
+      - "4436:4436"
+      - "4437:4437"
+
   oathkeeper:
     image: oryd/oathkeeper:v0.38
     depends_on:
@@ -64,8 +64,7 @@ services:
     ports:
       - 4455:4455
       - 4456:4456
-    command:
-      serve proxy -c "/etc/config/oathkeeper/oathkeeper.yml"
+    command: serve proxy -c "/etc/config/oathkeeper/oathkeeper.yml"
     environment:
       - LOG_LEVEL=debug
     restart: on-failure
@@ -80,8 +79,7 @@ services:
       - ./keto:/etc/config/keto
     environment:
       - LOG_LEVEL=debug
-    command:
-      migrate sql postgres://keto:secret@postgresd:5432/keto?sslmode=disable
+    command: migrate sql postgres://keto:secret@postgresd:5432/keto?sslmode=disable
     restart: on-failure
 
   keto:
@@ -102,11 +100,11 @@ services:
     volumes:
       - ./keto:/etc/config/keto
       - /keto_namespaces
-  
+
   postgresd:
     image: postgres:13.2
     volumes:
-        - ./scripts/init_db:/docker-entrypoint-initdb.d
+      - ./scripts/init_db:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     environment:

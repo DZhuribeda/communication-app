@@ -42,11 +42,14 @@
   id: "server:protected"
   upstream:
     preserve_host: true
-    url: "http://server:5000"
+    url: "http://messages:5000"
   match:
-    url: "http://127.0.0.1:4455/<{,tests}>"
+    url: "http://127.0.0.1:4455/<{,api/v1/tests,api/v1/channels/*}>"
     methods:
       - GET
+      - POST
+      - DELETE
+      - PATCH
   authenticators:
     -
       handler: cookie_session

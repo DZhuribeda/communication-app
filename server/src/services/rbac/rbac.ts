@@ -1,14 +1,67 @@
 import { Service } from "typedi";
+import fetch from "node-fetch";
+import { URLSearchParams } from "url";
 
-import * as grpc from "@grpc/grpc-js";
-import { WriteApi, ReadApi } from "@ory/keto-client";
-import writeService from "@ory/keto-grpc-client/write_service_grpc_pb.js";
-import acl from "@ory/keto-grpc-client/acl_pb.js";
-import writeData from "@ory/keto-grpc-client/write_service_pb.js";
-import checkService from "@ory/keto-grpc-client/check_service_grpc_pb.js";
-import checkData from "@ory/keto-grpc-client/check_service_pb.js";
 import config from "../../config";
 
+@Service()
+class KetoClient {
+  async checkRelationTuple(
+    namespace: string,
+    object: string,
+    relation: string,
+    subject: string
+  ): Promise<boolean> {
+    console.log("READ", object, relation, subject);
+    const resp = await fetch(`${config.keto.read_url}/check`, {
+      method: "POST",
+      body: JSON.stringify({
+        namespace: namespace,
+        object: object,
+        relation: relation,
+        subject: subject,
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await resp.json();
+    console.log(data);
+    return data.allowed;
+  }
+
+  async createRelationTuple(
+    namespace: string,
+    object: string,
+    relation: string,
+    subject: string
+  ) {
+    await fetch(`${config.keto.write_url}/relation-tuples`, {
+      method: "put",
+      body: JSON.stringify({
+        namespace: namespace,
+        object: object,
+        relation: relation,
+        subject: subject,
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  async deleteRelationTuple(
+    namespace: string,
+    object: string,
+    relation: string,
+    subject: string
+  ) {
+    const search = new URLSearchParams();
+    search.set("namespace", namespace);
+    search.set("object", object);
+    search.set("relation", relation);
+    search.set("subject", subject);
+    await fetch(`${config.keto.write_url}/relation-tuples?${search}`, {
+      method: "DELETE",
+    });
+  }
+}
 @Service()
 export abstract class BaseRBACService {
   abstract readonly namespace: string;
@@ -16,89 +69,33 @@ export abstract class BaseRBACService {
   abstract readonly rolesMapping: Record<string, string[]>;
 
   private readonly member = "member";
-  private writeClient: writeService.WriteServiceClient;
-  private checkClient: checkService.CheckServiceClient;
 
-  constructor() {
-    this.writeClient = new writeService.WriteServiceClient(
-      config.keto.write_url,
-      grpc.credentials.createInsecure()
-    );
-
-    this.checkClient = new checkService.CheckServiceClient(
-      config.keto.read_url,
-      grpc.credentials.createInsecure()
-    );
-  }
+  constructor(private ketoClient: KetoClient) {}
 
   private createResourceGroupName(resourceId: string, role: string) {
     return `${resourceId}-${role}`;
   }
 
-  private async writeTuple(
-    writeRequest: writeData.TransactRelationTuplesRequest
-  ) {
-    return new Promise<void>((resolve, reject) => {
-      this.writeClient.transactRelationTuples(writeRequest, (error) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve();
-        }
-      });
-    });
+  private createRoleSubjectSet(object: string) {
+    return `${this.namespace}:${object}#${this.member}`;
   }
 
-  private async checkTuple(
-    checkRequest: checkData.CheckRequest
-  ): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this.checkClient.check(checkRequest, (error, resp) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(resp.getAllowed());
-        }
-      });
-    });
-  }
-
-  private sentTuple(
-    objectId: string,
-    relation: string,
-    sub: acl.Subject,
-    action: writeData.RelationTupleDelta.Action
-  ) {
-    const relationTuple = new acl.RelationTuple();
-    relationTuple.setNamespace(this.namespace);
-    relationTuple.setObject(objectId);
-    relationTuple.setRelation(relation);
-    relationTuple.setSubject(sub);
-
-    const tupleDelta = new writeData.RelationTupleDelta();
-    tupleDelta.setAction(action);
-    tupleDelta.setRelationTuple(relationTuple);
-
-    const writeRequest = new writeData.TransactRelationTuplesRequest();
-    writeRequest.addRelationTupleDeltas(tupleDelta);
-    return this.writeTuple(writeRequest);
-  }
-
-  private insertRule(objectId: string, relation: string, sub: acl.Subject) {
-    return this.sentTuple(
+  private insertRule(objectId: string, relation: string, subject: string) {
+    console.log("INSERT", objectId, relation, subject);
+    return this.ketoClient.createRelationTuple(
+      this.namespace,
       objectId,
       relation,
-      sub,
-      writeData.RelationTupleDelta.Action.INSERT
+      subject
     );
   }
 
-  private deleteRule(objectId: string, relation: string, sub: acl.Subject) {
-    return this.sentTuple(
+  private deleteRule(objectId: string, relation: string, sub: string) {
+    return this.ketoClient.deleteRelationTuple(
+      this.namespace,
       objectId,
       relation,
-      sub,
-      writeData.RelationTupleDelta.Action.DELETE
+      sub
     );
   }
 
@@ -106,13 +103,18 @@ export abstract class BaseRBACService {
     await Promise.all(
       Object.keys(this.rolesMapping).flatMap((role) => {
         return this.rolesMapping[role].map((action) => {
-          const subjectSet = new acl.SubjectSet();
-          subjectSet.setNamespace(this.namespace);
-          subjectSet.setObject(this.createResourceGroupName(resourceId, role));
-          subjectSet.setRelation(this.member);
-          const sub = new acl.Subject();
-          sub.setSet(subjectSet);
-          return this.insertRule(resourceId, action, sub);
+          console.log(
+            this.createRoleSubjectSet(
+              this.createResourceGroupName(resourceId, role)
+            )
+          );
+          return this.insertRule(
+            resourceId,
+            action,
+            this.createRoleSubjectSet(
+              this.createResourceGroupName(resourceId, role)
+            )
+          );
         });
       })
     );
@@ -123,25 +125,23 @@ export abstract class BaseRBACService {
       Object.keys(this.rolesMapping).flatMap((role) => {
         // TODO: delete roles binding members
         return this.rolesMapping[role].map((action) => {
-          const subjectSet = new acl.SubjectSet();
-          subjectSet.setNamespace(this.namespace);
-          subjectSet.setObject(this.createResourceGroupName(resourceId, role));
-          subjectSet.setRelation(this.member);
-          const sub = new acl.Subject();
-          sub.setSet(subjectSet);
-          return this.deleteRule(resourceId, action, sub);
+          return this.deleteRule(
+            resourceId,
+            action,
+            this.createRoleSubjectSet(
+              this.createResourceGroupName(resourceId, role)
+            )
+          );
         });
       })
     );
   }
 
   async setUserRole(resourseId: string, userId: string, role: string) {
-    const sub = new acl.Subject();
-    sub.setId(userId);
     return this.insertRule(
       this.createResourceGroupName(resourseId, role),
       this.member,
-      sub
+      userId
     );
   }
 
@@ -150,15 +150,11 @@ export abstract class BaseRBACService {
     action: string,
     userId: string
   ): Promise<boolean> {
-    const checkRequest = new checkData.CheckRequest();
-    checkRequest.setNamespace(this.namespace);
-    checkRequest.setObject(resourseId);
-    checkRequest.setRelation(action);
-
-    const sub = new acl.Subject();
-    sub.setId(userId);
-    checkRequest.setSubject(sub);
-
-    return this.checkTuple(checkRequest);
+    return this.ketoClient.checkRelationTuple(
+      this.namespace,
+      resourseId,
+      action,
+      userId
+    );
   }
 }

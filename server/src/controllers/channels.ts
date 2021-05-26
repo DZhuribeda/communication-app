@@ -26,7 +26,7 @@ class ChannelDto {
 @JsonController("/channels")
 @Service()
 export class ChannelsController {
-  constructor(private channelsService: ChannelsService) { }
+  constructor(private channelsService: ChannelsService) {}
 
   @Get()
   getAll() {
@@ -41,7 +41,7 @@ export class ChannelsController {
 
   @Authorized()
   @Post()
-  @Redirect("/:channelId")
+  @Redirect("/api/v1/channels/:channelId")
   async post(@Body() channelDto: ChannelDto, @UserId() userId: string) {
     const channelId = await this.channelsService.create(
       userId,
