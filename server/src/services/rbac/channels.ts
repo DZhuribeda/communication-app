@@ -33,6 +33,6 @@ export class ChannelsRBACService extends BaseRBACService {
       ChannelAction.READ,
     ],
     [ChannelRole.WRITER]: [ChannelAction.WRITE, ChannelAction.READ],
-    [ChannelRole.READER]: [ChannelAction.WRITE],
+    [ChannelRole.READER]: [ChannelAction.READ],
   };
 }

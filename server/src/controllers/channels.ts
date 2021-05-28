@@ -1,4 +1,12 @@
-import { IsAlpha, IsDefined } from "class-validator";
+import {
+  IsAlpha,
+  IsDefined,
+  IsInt,
+  IsOptional,
+  IsPositive,
+  Max,
+  Min,
+} from "class-validator";
 import {
   JsonController,
   Param,
@@ -10,10 +18,12 @@ import {
   Authorized,
   Redirect,
   OnUndefined,
+  QueryParams,
 } from "routing-controllers";
 import { Service } from "typedi";
 import { UserId } from "../decorators/userId";
 import { ChannelsService } from "../services/channels";
+import { ChannelsRepository } from "../services/repositories/channels";
 import { CHANNEL_NAMESPACE, ChannelAction } from "../services/rbac/channels";
 import { createRole } from "../utils/rbac";
 
@@ -23,20 +33,36 @@ class ChannelDto {
   title!: string;
 }
 
+class ChannelsListQuery {
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  cursor!: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  pageSize!: number;
+}
+
 @JsonController("/channels")
 @Service()
 export class ChannelsController {
-  constructor(private channelsService: ChannelsService) {}
+  constructor(
+    private channelsService: ChannelsService,
+    private channelsRepository: ChannelsRepository
+  ) {}
 
   @Get()
-  getAll() {
-    return "This action returns all channels";
+  getAll(@QueryParams() query: ChannelsListQuery, @UserId() userId: string) {
+    return this.channelsRepository.list(userId, query.pageSize, query.cursor);
   }
 
   @Authorized(createRole(CHANNEL_NAMESPACE, ChannelAction.READ))
   @Get("/:channelId")
   getOne(@Param("channelId") channelId: number) {
-    return "This action returns channel #" + channelId;
+    return this.channelsRepository.get(channelId);
   }
 
   @Authorized()

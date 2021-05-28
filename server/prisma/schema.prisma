@@ -11,8 +11,31 @@ generator client {
 }
 
 model Channel {
-  id        Int      @default(autoincrement()) @id
+  id        Int             @id @default(autoincrement())
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  title     String          @db.VarChar(255)
+  members   ChannelMember[]
+  messages  Message[]
+}
+
+model ChannelMember {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  title     String   @db.VarChar(255)
+  userId    String   @db.VarChar(255)
+  channelId Int
+  channel   Channel  @relation(fields: [channelId], references: [id])
+
+  @@unique([channelId, userId])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  channelId Int
+  channel   Channel @relation(fields: [channelId], references: [id])
+  userId    String  @db.VarChar(255)
+  text      String
 }
