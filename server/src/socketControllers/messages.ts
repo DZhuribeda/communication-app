@@ -52,6 +52,8 @@ export class MessageController {
       channels.forEach((c) => socket.join(getChannelRoom(c.id)));
       cursorId = channels[channels.length - 1];
     }
+
+    // TODO: that's not scalablle
     this.subs.push(
       channelCreatedEvent.subscribe((data) => {
         if (data.creatorId === userId) {
@@ -75,13 +77,16 @@ export class MessageController {
     const userId = socket.userId;
     this.subscribeToRooms(socket, userId);
 
+    // TODO: that's not scalablle
     messageCreatedEvent.subscribe((data) => {
-      socket.to(getChannelRoom(data.channelId)).emit("message:created", {
-        messageId: data.messageId,
-        userId: data.userId,
-        text: data.text,
-        channelId: data.channelId,
-      });
+      if (userId === data.userId) {
+        socket.to(getChannelRoom(data.channelId)).emit("message:created", {
+          messageId: data.messageId,
+          userId: data.userId,
+          text: data.text,
+          channelId: data.channelId,
+        });
+      }
     });
   }
 
