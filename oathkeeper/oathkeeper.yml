@@ -66,6 +66,14 @@ authenticators:
       only:
         - ory_kratos_session
 
+  bearer_token:
+    enabled: true
+    config:
+      check_session_url: http://kratos:4433/sessions/whoami
+      preserve_path: true
+      extra_from: "@this"
+      subject_from: "identity.id"
+
   noop:
     enabled: true
 

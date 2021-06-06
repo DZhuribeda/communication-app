@@ -51,8 +51,8 @@
       - DELETE
       - PATCH
   authenticators:
-    -
-      handler: cookie_session
+    - handler: cookie_session
+    - handler: bearer_token
   authorizer:
     handler: allow
   mutators:

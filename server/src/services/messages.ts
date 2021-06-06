@@ -7,17 +7,17 @@ export class MessagesService {
   constructor(private messagesRepository: MessagesRepository) {}
 
   async create(creatorId: string, channelId: number, text: string) {
-    const messageId = await this.messagesRepository.create(
+    const message = await this.messagesRepository.create(
       creatorId,
       channelId,
       text
     );
     messageCreatedEvent.emit({
-      messageId,
+      messageId: message.id,
       userId: creatorId,
       channelId,
       text,
     });
-    return messageId;
+    return message.id;
   }
 }
