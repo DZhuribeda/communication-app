@@ -22,7 +22,7 @@ export async function createServer() {
   const app = await createApp();
   const httpServer = http.createServer(app);
   const io = new Server(httpServer, {
-    path: "/ws/messages",
+    path: "/ws/messages/",
   });
   useContainer(Container);
   useSocketServer(io, {

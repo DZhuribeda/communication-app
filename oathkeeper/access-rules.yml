@@ -44,7 +44,7 @@
     preserve_host: true
     url: "http://messages:5000"
   match:
-    url: "http://127.0.0.1:4455/<{,api/v1/tests,api/v1/channels/*}>"
+    url: "<{http,ws}>://127.0.0.1:4455/<{,api/v1/tests,api/v1/channels,api/v1/channels/*,ws/messages/*}>"
     methods:
       - GET
       - POST

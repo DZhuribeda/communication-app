@@ -3,16 +3,19 @@ import fetch from "node-fetch";
 import { URLSearchParams } from "url";
 
 import config from "../../config";
+import { Logger, LoggerInterface } from "../../decorators/logger";
 
 @Service()
 class KetoClient {
+  constructor(@Logger() private logger: LoggerInterface) {}
+
   async checkRelationTuple(
     namespace: string,
     object: string,
     relation: string,
     subject: string
   ): Promise<boolean> {
-    console.log("READ", object, relation, subject);
+    this.logger.debug("read permission info", { object, relation, subject });
     const resp = await fetch(`${config.keto.read_url}/check`, {
       method: "POST",
       body: JSON.stringify({
@@ -24,7 +27,7 @@ class KetoClient {
       headers: { "Content-Type": "application/json" },
     });
     const data = await resp.json();
-    console.log(data);
+    this.logger.debug("is allowed read", { allowed: data.allowed });
     return data.allowed;
   }
 
@@ -34,6 +37,7 @@ class KetoClient {
     relation: string,
     subject: string
   ) {
+    this.logger.debug("insert permission info", { object, relation, subject });
     await fetch(`${config.keto.write_url}/relation-tuples`, {
       method: "put",
       body: JSON.stringify({
@@ -81,7 +85,6 @@ export abstract class BaseRBACService {
   }
 
   private insertRule(objectId: string, relation: string, subject: string) {
-    console.log("INSERT", objectId, relation, subject);
     return this.ketoClient.createRelationTuple(
       this.namespace,
       objectId,
@@ -103,11 +106,6 @@ export abstract class BaseRBACService {
     await Promise.all(
       Object.keys(this.rolesMapping).flatMap((role) => {
         return this.rolesMapping[role].map((action) => {
-          console.log(
-            this.createRoleSubjectSet(
-              this.createResourceGroupName(resourceId, role)
-            )
-          );
           return this.insertRule(
             resourceId,
             action,

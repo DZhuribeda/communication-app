@@ -12,7 +12,11 @@ export class MessagesRepository {
         id: true,
       },
       data: {
-        channelId,
+        channel: {
+          connect: {
+            id: channelId,
+          },
+        },
         userId: creatorId,
         text,
       },

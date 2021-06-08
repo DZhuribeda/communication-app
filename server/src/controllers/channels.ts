@@ -1,5 +1,4 @@
 import {
-  IsAlpha,
   IsDefined,
   IsInt,
   IsOptional,
@@ -29,7 +28,6 @@ import { createRole } from "../utils/rbac";
 
 class ChannelDto {
   @IsDefined()
-  @IsAlpha()
   title!: string;
 }
 

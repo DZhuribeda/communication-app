@@ -3,12 +3,16 @@ import faker from "faker";
 
 import { TEST_CONFIG } from "./config";
 
-interface User {
+export interface User {
   id?: string;
   firstName: string;
   lastName: string;
   password: string;
   email: string;
+}
+
+export interface AuthorizedUser extends User {
+  token: string;
 }
 
 export async function createUser(): Promise<User> {
@@ -37,7 +41,7 @@ export async function createUser(): Promise<User> {
 
   const userRegistrationData = await userRegistrationResponse.json();
   // TODO: that's error sometimes, faker generate not so random user, we should add clean up if helper was used.
-  // 
+
   return {
     id: userRegistrationData.identity.id,
     firstName,
@@ -66,4 +70,13 @@ export async function loginUser(user: User): Promise<string> {
 
   const userLoginData = await userLoginResponse.json();
   return userLoginData.session_token;
+}
+
+export async function createAuthorizedUser(): Promise<AuthorizedUser> {
+  const user = await createUser();
+  const token = await loginUser(user);
+  return {
+    ...user,
+    token,
+  };
 }

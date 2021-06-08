@@ -1,4 +1,4 @@
-import { Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
 import {
   ConnectedSocket,
   OnConnect,
@@ -6,6 +6,7 @@ import {
   SocketController,
   MessageBody,
   OnDisconnect,
+  NamespacedIO,
 } from "socket-controllers";
 import { IsDefined, IsInt, IsPositive } from "class-validator";
 import { Service } from "typedi";
@@ -18,6 +19,7 @@ import { getChannelRoom } from "../utils/channels";
 import AuthService from "../services/auth";
 import { ChannelAction, CHANNEL_NAMESPACE } from "../services/rbac/channels";
 import { createRole } from "../utils/rbac";
+import { Logger, LoggerInterface } from "../decorators/logger";
 
 class MessageDto {
   @IsInt()
@@ -28,11 +30,12 @@ class MessageDto {
   text!: string;
 }
 
-@SocketController()
+@SocketController("/messages")
 @Service()
 export class MessageController {
   subs: Subscription[];
   constructor(
+    @Logger() private logger: LoggerInterface,
     private authService: AuthService,
     private channelsRepository: ChannelsRepository,
     private messagesService: MessagesService
@@ -49,50 +52,79 @@ export class MessageController {
     );
     // TODO: change to generator
     while (channels.length === channelsBatchSize && cursorId !== null) {
-      channels.forEach((c) => socket.join(getChannelRoom(c.id)));
+      channels.forEach((c) => {
+        const channelRoom = getChannelRoom(c.id);
+        this.logger.info("User joined to room", { channelRoom });
+        socket.join(channelRoom);
+      });
       cursorId = channels[channels.length - 1];
     }
 
-    // TODO: that's not scalablle
+    // TODO: that's not scalable because events sent throught local event bus
     this.subs.push(
       channelCreatedEvent.subscribe((data) => {
+        this.logger.info("Received channel created event", { data, userId });
         if (data.creatorId === userId) {
-          socket.join(getChannelRoom(data.channelId));
+          const channelRoom = getChannelRoom(data.channelId);
+          this.logger.info("User joined to room", { channelRoom, userId });
+          socket.join(channelRoom);
         }
       })
     );
     this.subs.push(
       userJoinedEvent.subscribe((data) => {
         if (data.userId === userId) {
-          socket.join(getChannelRoom(data.channelId));
+          const channelRoom = getChannelRoom(data.channelId);
+          this.logger.info("User joined to room", { channelRoom, userId });
+          socket.join(channelRoom);
         }
       })
     );
   }
 
   @OnConnect()
-  connect(@ConnectedSocket() socket: Socket) {
-    console.log("Connected");
+  async connect(@NamespacedIO() namespacedIo: Server, @ConnectedSocket() socket: Socket) {
+    this.logger.info("New user connected to socket");
+    // TODO: move authenticcation logic out of namespaced controller
+    // maybe have to implement same auth level as in routing controllers 
+    const authHeader = socket.handshake.headers["authorization"];
+    const user = await this.authService.getCurrentUser(authHeader);
+    if (user === null) {
+      this.logger.info("User unauthorized to socket");
+      return;
+    }
+    const userId = user.id;
+    this.logger.info("User connected to socket", { userId });
+    // TODO: create type with userId in socket
     //@ts-ignore
-    const userId = socket.userId;
+    socket.userId = userId;
     this.subscribeToRooms(socket, userId);
 
     // TODO: that's not scalablle
     messageCreatedEvent.subscribe((data) => {
+      this.logger.info("Received message created event", { data, userId });
       if (userId === data.userId) {
-        socket.to(getChannelRoom(data.channelId)).emit("message:created", {
+        const channelRoom = getChannelRoom(data.channelId);
+        namespacedIo.to(channelRoom).emit("message:created", {
           messageId: data.messageId,
           userId: data.userId,
           text: data.text,
           channelId: data.channelId,
+        });
+        this.logger.info("Emitted message:created event to room", {
+          userId,
+          channelRoom,
         });
       }
     });
   }
 
   @OnDisconnect()
-  disconnect() {
-    console.log("Disconnected");
+  disconnect(@ConnectedSocket() socket: Socket) {
+    this.logger.info("User disconnected from socket", {
+      // @ts-ignore
+      userId: socket.userId,
+    });
     this.subs.forEach((s) => s.cancel());
   }
 

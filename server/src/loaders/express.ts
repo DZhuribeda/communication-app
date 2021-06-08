@@ -22,7 +22,7 @@ export default ({ app }: { app: express.Application }) => {
       if (roles.length === 0) {
         return true;
       }
-      // TODO: Find better way to extract resourceId 
+      // TODO: Find better way to extract resourceId
       const resourceId = action.request.params.channelId;
       return authService.authorize(user.id, resourceId, roles);
     },
