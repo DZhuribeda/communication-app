@@ -4,7 +4,7 @@ import faker from "faker";
 import { TEST_CONFIG } from "./config";
 
 export interface User {
-  id?: string;
+  id: string;
   firstName: string;
   lastName: string;
   password: string;

@@ -44,7 +44,7 @@ class ChannelsListQuery {
   pageSize!: number;
 }
 
-@JsonController("/channels")
+@JsonController("/channels/")
 @Service()
 export class ChannelsController {
   constructor(
@@ -54,18 +54,20 @@ export class ChannelsController {
 
   @Get()
   getAll(@QueryParams() query: ChannelsListQuery, @UserId() userId: string) {
+    console.log("channels");
     return this.channelsRepository.list(userId, query.pageSize, query.cursor);
   }
 
   @Authorized(createRole(CHANNEL_NAMESPACE, ChannelAction.READ))
-  @Get("/:channelId")
+  @Get(":channelId/")
   getOne(@Param("channelId") channelId: number) {
+    console.log(channelId);
     return this.channelsRepository.get(channelId);
   }
 
   @Authorized()
   @Post()
-  @Redirect("/api/v1/channels/:channelId")
+  @Redirect("/api/v1/channels/:channelId/")
   async post(@Body() channelDto: ChannelDto, @UserId() userId: string) {
     const channelId = await this.channelsService.create(
       userId,
@@ -78,14 +80,14 @@ export class ChannelsController {
 
   @Authorized(createRole(CHANNEL_NAMESPACE, ChannelAction.MANAGE))
   @OnUndefined(204)
-  @Put("/:channelId")
+  @Put(":channelId/")
   put(@Param("channelId") channelId: number, @Body() channelDto: ChannelDto) {
     return this.channelsService.update(channelId, channelDto.title);
   }
 
-  @Authorized(createRole(CHANNEL_NAMESPACE, ChannelAction.OWN))
+  @Authorized(createRole(CHANNEL_NAMESPACE, ChannelAction.DELETE))
   @OnUndefined(204)
-  @Delete("/:channelId")
+  @Delete(":channelId/")
   delete(@Param("channelId") channelId: number) {
     return this.channelsService.delete(channelId);
   }

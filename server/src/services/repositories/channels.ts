@@ -6,13 +6,18 @@ import PrismaService from "../prisma";
 export class ChannelsRepository {
   constructor(private prismaService: PrismaService) {}
 
-  async create(creatorId: string, title: string): Promise<number> {
+  async create(
+    creatorId: string,
+    title: string,
+    role: string
+  ): Promise<number> {
     const prisma = this.prismaService.getPrisma();
     const channel = await prisma.channel.create({
       data: {
         title,
         members: {
           create: {
+            role,
             userId: creatorId,
           },
         },
@@ -89,5 +94,94 @@ export class ChannelsRepository {
       });
     }
     return prisma.channel.findMany(query);
+  }
+
+  listMembers(channelId: number, pageSize: number = 100, cursor?: string) {
+    const prisma = this.prismaService.getPrisma();
+    let query = {
+      take: pageSize,
+      select: {
+        userId: true,
+        role: true,
+      },
+      where: {
+        channelId,
+      },
+      orderBy: {
+        channelId: Prisma.SortOrder.asc,
+        userId: Prisma.SortOrder.asc,
+      },
+    };
+    if (cursor) {
+      return prisma.channelMember.findMany({
+        ...query,
+        skip: 1,
+        cursor: {
+          channelId_userId: {
+            channelId: channelId,
+            userId: cursor,
+          },
+        },
+      });
+    }
+    return prisma.channelMember.findMany(query);
+  }
+
+  getMember(channelId: number, userId: string) {
+    const prisma = this.prismaService.getPrisma();
+    return prisma.channelMember.findUnique({
+      select: {
+        userId: true,
+        role: true,
+      },
+      where: {
+        channelId_userId: {
+          channelId,
+          userId,
+        },
+      },
+    });
+  }
+
+  async addMember(channelId: number, memberId: string, role: string) {
+    const prisma = this.prismaService.getPrisma();
+    await prisma.channelMember.create({
+      data: {
+        userId: memberId,
+        role,
+        channel: {
+          connect: {
+            id: channelId,
+          },
+        },
+      },
+    });
+  }
+
+  async changeMemberRole(channelId: number, memberId: string, role: string) {
+    const prisma = this.prismaService.getPrisma();
+    await prisma.channelMember.update({
+      where: {
+        channelId_userId: {
+          channelId,
+          userId: memberId,
+        },
+      },
+      data: {
+        role,
+      },
+    });
+  }
+
+  async deleteMember(channelId: number, memberId: string) {
+    const prisma = this.prismaService.getPrisma();
+    await prisma.channelMember.delete({
+      where: {
+        channelId_userId: {
+          channelId,
+          userId: memberId,
+        },
+      },
+    });
   }
 }

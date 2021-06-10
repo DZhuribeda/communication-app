@@ -10,7 +10,7 @@ export enum ChannelRole {
   READER = "READER",
 }
 export enum ChannelAction {
-  OWN = "OWN",
+  DELETE = "DELETE",
   MANAGE = "MANAGE",
   WRITE = "WRITE",
   READ = "READ",
@@ -22,7 +22,7 @@ export class ChannelsRBACService extends BaseRBACService {
   actions = Object.values(ChannelAction);
   rolesMapping = {
     [ChannelRole.OWNER]: [
-      ChannelAction.OWN,
+      ChannelAction.DELETE,
       ChannelAction.MANAGE,
       ChannelAction.WRITE,
       ChannelAction.READ,

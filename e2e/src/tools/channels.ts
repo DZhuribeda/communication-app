@@ -8,7 +8,7 @@ export async function createChannel(token: string) {
   };
   console.log('channel request', payload);
   const channelResponse = await fetch(
-    `${TEST_CONFIG.base_url}/api/v1/channels`,
+    `${TEST_CONFIG.base_url}/api/v1/channels/`,
     {
       method: "post",
       body: JSON.stringify(payload),

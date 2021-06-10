@@ -11,7 +11,11 @@ import {
 import { IsDefined, IsInt, IsPositive } from "class-validator";
 import { Service } from "typedi";
 import { ChannelsRepository } from "../services/repositories/channels";
-import { channelCreatedEvent, userJoinedEvent } from "../events/channels";
+import {
+  channelCreatedEvent,
+  userDeletedEvent,
+  userJoinedEvent,
+} from "../events/channels";
 import { Subscription } from "sub-events";
 import { messageCreatedEvent } from "../events/messages";
 import { MessagesService } from "../services/messages";
@@ -80,13 +84,34 @@ export class MessageController {
         }
       })
     );
+    this.subs.push(
+      userJoinedEvent.subscribe((data) => {
+        if (data.userId === userId) {
+          const channelRoom = getChannelRoom(data.channelId);
+          this.logger.info("User joined to room", { channelRoom, userId });
+          socket.join(channelRoom);
+        }
+      })
+    );
+    this.subs.push(
+      userDeletedEvent.subscribe((data) => {
+        if (data.userId === userId) {
+          const channelRoom = getChannelRoom(data.channelId);
+          this.logger.info("User leaved to room", { channelRoom, userId });
+          socket.leave(channelRoom);
+        }
+      })
+    );
   }
 
   @OnConnect()
-  async connect(@NamespacedIO() namespacedIo: Server, @ConnectedSocket() socket: Socket) {
+  async connect(
+    @NamespacedIO() namespacedIo: Server,
+    @ConnectedSocket() socket: Socket
+  ) {
     this.logger.info("New user connected to socket");
     // TODO: move authenticcation logic out of namespaced controller
-    // maybe have to implement same auth level as in routing controllers 
+    // maybe have to implement same auth level as in routing controllers
     const authHeader = socket.handshake.headers["authorization"];
     const user = await this.authService.getCurrentUser(authHeader);
     if (user === null) {

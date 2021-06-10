@@ -135,11 +135,43 @@ export abstract class BaseRBACService {
     );
   }
 
-  async setUserRole(resourseId: string, userId: string, role: string) {
-    return this.insertRule(
-      this.createResourceGroupName(resourseId, role),
-      this.member,
-      userId
+  async setUserRole(
+    resourseId: string,
+    userId: string,
+    role?: string | null,
+    previousRole?: string | null
+  ) {
+    // TODO: remove previous user role param
+    if (previousRole) {
+      await this.deleteRule(
+        this.createResourceGroupName(resourseId, previousRole),
+        this.member,
+        userId
+      );
+    }
+    if (role) {
+      await this.insertRule(
+        this.createResourceGroupName(resourseId, role),
+        this.member,
+        userId
+      );
+    }
+  }
+
+  async deleteUseRoles(resourceId: string) {
+    await Promise.all(
+      Object.keys(this.rolesMapping).flatMap((role) => {
+        // TODO: delete roles binding members
+        return this.rolesMapping[role].map((action) => {
+          return this.deleteRule(
+            resourceId,
+            action,
+            this.createRoleSubjectSet(
+              this.createResourceGroupName(resourceId, role)
+            )
+          );
+        });
+      })
     );
   }
 

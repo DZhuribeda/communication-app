@@ -9,3 +9,8 @@ export const userJoinedEvent = new SubEvent<{
   userId: string;
   channelId: number;
 }>();
+
+export const userDeletedEvent = new SubEvent<{
+  userId: string;
+  channelId: number;
+}>();
