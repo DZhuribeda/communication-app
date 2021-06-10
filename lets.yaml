@@ -1,0 +1,14 @@
+shell: bash
+
+commands:
+  rund:
+    cmd: docker-compose up -d
+
+  migrate:
+    cmd: |
+      docker-compose exec keto keto namespace migrate up channels -c /etc/config/keto/keto.yml -y  
+      docker-compose exec messages npx prisma db push
+
+  run-ws:
+    cmd: |
+      go run ./ws/*.go
