@@ -11,4 +11,5 @@ commands:
 
   run-ws:
     cmd: |
-      go run ./ws/*.go
+      cd ws;
+      go run *.go
