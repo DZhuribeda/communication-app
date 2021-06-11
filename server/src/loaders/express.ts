@@ -7,7 +7,6 @@ import AuthService from "../services/auth";
 export default ({ app }: { app: express.Application }) => {
   useContainer(Container);
   useExpressServer(app, {
-    routePrefix: '/api/v1',
     controllers: [path.dirname(__dirname) + "/controllers/*.ts"],
     authorizationChecker: async (action: Action, roles: string[]) => {
       const authHeader = action.request.headers["authorization"];

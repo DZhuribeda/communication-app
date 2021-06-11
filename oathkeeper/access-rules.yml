@@ -62,3 +62,29 @@
     - handler: redirect
       config:
         to: http://127.0.0.1:4455/auth/login
+
+
+-
+  id: "ws-gateway:protected"
+  upstream:
+    preserve_host: true
+    url: "http://ws-gateway:5001"
+  match:
+    url: "<{http,ws}>://127.0.0.1:4455/<{ws**}>"
+    methods:
+      - GET
+      - POST
+      - DELETE
+      - PATCH
+  authenticators:
+    - handler: cookie_session
+    - handler: bearer_token
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: header
+    - handler: id_token
+  errors:
+    - handler: redirect
+      config:
+        to: http://127.0.0.1:4455/auth/login

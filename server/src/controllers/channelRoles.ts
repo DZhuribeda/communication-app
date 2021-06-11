@@ -7,7 +7,7 @@ import {
 } from "../services/rbac/channels";
 import { createRole } from "../utils/rbac";
 
-@JsonController("/channels/:channelId/roles/")
+@JsonController("/api/v1/channels/:channelId/roles/")
 @Service()
 export class ChannelRolesController {
   constructor(private channelsRBACService: ChannelsRBACService) {}

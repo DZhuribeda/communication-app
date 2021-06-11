@@ -51,7 +51,7 @@ class ChannelMembersListQuery {
   pageSize!: number;
 }
 
-@JsonController("/channels/:channelId/members/")
+@JsonController("/api/v1/channels/:channelId/members/")
 @Service()
 export class ChannelsController {
   constructor(

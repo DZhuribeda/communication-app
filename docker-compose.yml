@@ -8,6 +8,7 @@ services:
       - 3000:3000
     volumes:
       - ./auth-ui:/app
+      - /app/node_modules
   messages:
     links:
       - postgresd:postgresd
@@ -22,6 +23,21 @@ services:
       - 5000:5000
     volumes:
       - ./server:/app
+      - /app/node_modules
+  ws-gateway:
+    links:
+      - postgresd:postgresd
+      - messages:messages
+    environment:
+      - JWKS_URI=http://oathkeeper:4456/.well-known/jwks.json
+      - EVENT_RULES=./config/development.yml
+    build:
+      context: ./ws-gateway
+    ports:
+      - 5001:5001
+    volumes:
+      - ./ws-gateway:/app
+      - /app/node_modules
 
   kratos-migrate:
     image: oryd/kratos:v0.6.3-alpha.1
