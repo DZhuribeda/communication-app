@@ -13,3 +13,8 @@ commands:
     cmd: |
       cd ws;
       go run *.go
+
+  test-ws:
+    cmd: |
+      cd ws;
+      go test ./...

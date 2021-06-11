@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -29,7 +28,7 @@ func reader(conn *websocket.Conn) {
 
 		fmt.Println(string(p))
 
-		if err := conn.WriteMessage(messageType, []byte(fmt.Sprintf("Pong! | %d", time.Now().Unix()))); err != nil {
+		if err := conn.WriteMessage(messageType, []byte(fmt.Sprintf("Pong! | %s", p))); err != nil {
 			log.Println(err)
 			return
 		}
