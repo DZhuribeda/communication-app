@@ -54,9 +54,11 @@ test("guest can receive messages", (done) => {
   let channelId: number;
 
   socketAuthor.on("message:created", () => {
+    console.log("author receive message");
     partialDone();
   });
   socketGuest.on("message:created", () => {
+    console.log("guest receive message");
     partialDone();
   });
   createChannel(author.token)

@@ -10,7 +10,7 @@ if (envFound.error) {
   throw new Error("⚠️  Couldn't find .env file  ⚠️");
 }
 
-const requiredEnv = ["JWKS_URI"];
+const requiredEnv = ["JWKS_URI", "REDIS_URL"];
 requiredEnv.forEach((envVariable) => {
   const envVariableValue = process.env[envVariable];
   if (!envVariableValue) {
@@ -25,6 +25,7 @@ export default {
     level: process.env.LOG_LEVEL,
   },
 
+  redisUrl: process.env.REDIS_URL as string,
   jwksUri: process.env.JWKS_URI as string,
   eventRules: process.env.EVENT_RULES as string,
 };

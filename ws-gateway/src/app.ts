@@ -1,82 +1,22 @@
-import { Server as HttpServer } from "http";
-import fetch from "node-fetch";
-import { Server, ServerOptions, Socket } from "socket.io";
-import { loadEventRules } from "./eventRules";
+import { createServer } from "http";
+import * as grpc from "@grpc/grpc-js";
+import { Container } from "typedi";
+import config from "./config";
 import Logger from "./logger";
+import loadAll from "./loaders";
 
-function createEventClient(
-  socket: Socket,
-  url: string,
-  extraHeaders?: string[]
-) {
-  async function send(path: string, payload?: any) {
-    const requestPath = `${url}${path}`;
-    Logger.debug("Requesting upstream", {
-      url: requestPath,
-    });
-    return fetch(requestPath, {
-      method: "POST",
-      body: payload ? JSON.stringify(payload) : undefined,
-      headers: {
-        "Content-Type": "application/json",
-        ...(extraHeaders
-          ? extraHeaders.reduce<{ [key: string]: string }>((acc, header) => {
-              const normalizedHeader = header.toLowerCase();
-              if (socket.handshake.headers[normalizedHeader]) {
-                acc[normalizedHeader] = socket.handshake.headers[
-                  normalizedHeader
-                ] as string;
-              }
-              return acc;
-            }, {})
-          : {}),
-      },
-    }).then((resp) => {
-      if (!resp.ok) {
-        Logger.debug("Error during request to upstream", {
-          status: resp.status,
-        });
-      }
-    }).catch((err) => {
-      // TODO: add better logging
-      Logger.debug("Error during request to upstream", {
-        err,
-      });});
-  }
+export async function createApplication() {
+  const httpServer = createServer();
+  await loadAll({ httpServer });
+  const grpcServer = Container.get(grpc.Server);
+
   return {
-    onConnect: async () => {
-      return send("connect/");
-    },
-    onEvent: async (eventName: string, payload?: any) => {
-      return send(`event/${eventName}/`, payload);
+    run: () => {
+      httpServer.listen(config.port);
+      Logger.info("Server is running", {
+        port: config.port,
+      });
+      grpcServer.start();
     },
   };
-}
-
-export async function createApplication(
-  httpServer: HttpServer,
-  serverOptions: Partial<ServerOptions> = {}
-): Promise<Server> {
-  const io = new Server(httpServer, {
-    path: "/ws/",
-    ...serverOptions,
-  });
-  const eventRules = await loadEventRules();
-
-  for (const eventRule of eventRules) {
-    io.of(eventRule.match.namespace).on("connection", (socket) => {
-      const eventClient = createEventClient(
-        socket,
-        eventRule.upstream.url,
-        eventRule.upstream.headers
-      );
-      Logger.info("Socket connected");
-      eventClient.onConnect();
-      socket.onAny((eventName, payload) => {
-        eventClient.onEvent(eventName, payload);
-      });
-    });
-  }
-
-  return io;
 }

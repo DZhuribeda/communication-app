@@ -28,17 +28,19 @@ services:
   ws-gateway:
     links:
       - postgresd:postgresd
+      - redis:redis
       - messages:messages
     environment:
       - JWKS_URI=http://oathkeeper:4456/.well-known/jwks.json
       - EVENT_RULES=./config/development.yml
+      - REDIS_URL=redis://redis:6379/1
     build:
       context: ./ws-gateway
     ports:
       - 5001:5001
     volumes:
       - ./ws-gateway:/app
-      - /app/node_modules
+      # - /app/node_modules
 
   kratos-migrate:
     image: oryd/kratos:v0.6.3-alpha.1
@@ -128,3 +130,6 @@ services:
       - POSTGRES_MULTIPLE_DATABASES=kratos,keto,messages
       - POSTGRES_USER=superuser
       - POSTGRES_PASSWORD=secret
+
+  redis:
+    image: redis:6.2.4

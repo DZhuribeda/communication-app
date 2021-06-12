@@ -26,8 +26,8 @@ export async function createServer() {
   });
   useContainer(Container);
   useSocketServer(io, {
-    controllers: [__dirname + '/socketControllers/*.ts'],
-    middlewares: [__dirname + '/socketMiddewares/*.ts'],
+    controllers: [__dirname + "/socketControllers/*.ts"],
+    middlewares: [__dirname + "/socketMiddewares/*.ts"],
   });
   return httpServer;
 }

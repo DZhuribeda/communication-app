@@ -3,5 +3,5 @@ export function createRole(namespace: string, action: string) {
 }
 
 export function splitRole(role: string): [string, string] {
-  return role.split('_') as [string, string];
+  return role.split("_") as [string, string];
 }
