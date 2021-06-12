@@ -22,7 +22,8 @@ export default ({ app }: { app: express.Application }) => {
         return true;
       }
       // TODO: Find better way to extract resourceId
-      const resourceId = action.request.params.channelId;
+      const resourceId =
+        action.request.params.channelId || action.request.body?.channelId;
       return authService.authorize(user.id, resourceId, roles);
     },
     currentUserChecker: async (action: Action) => {

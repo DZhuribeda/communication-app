@@ -37,7 +37,11 @@ function createEventClient(
           status: resp.status,
         });
       }
-    });
+    }).catch((err) => {
+      // TODO: add better logging
+      Logger.debug("Error during request to upstream", {
+        err,
+      });});
   }
   return {
     onConnect: async () => {
@@ -68,8 +72,8 @@ export async function createApplication(
       );
       Logger.info("Socket connected");
       eventClient.onConnect();
-      socket.onAny((eventName, ...args) => {
-        eventClient.onEvent(eventName, args);
+      socket.onAny((eventName, payload) => {
+        eventClient.onEvent(eventName, payload);
       });
     });
   }

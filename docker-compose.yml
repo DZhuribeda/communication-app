@@ -17,6 +17,7 @@ services:
       - KETO_READ_URL=http://keto:4466
       - KETO_WRITE_URL=http://keto:4467
       - JWKS_URI=http://oathkeeper:4456/.well-known/jwks.json
+      - WS_GATEWAY_GRPC_URI=ws-gateway:5002
     build:
       context: ./server
     ports:

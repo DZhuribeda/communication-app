@@ -20,6 +20,7 @@ requiredEnv.forEach((envVariable) => {
 
 export default {
   port: parseInt(process.env.PORT || "", 10),
+  grpcPort: parseInt(process.env.GRPC_PORT || "", 10),
   log: {
     level: process.env.LOG_LEVEL,
   },

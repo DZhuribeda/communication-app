@@ -4,5 +4,5 @@
       - X-User
       - Authorization
   match:
-    namespace: messages
+    namespace: /messages
   

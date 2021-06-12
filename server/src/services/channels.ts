@@ -6,12 +6,17 @@ import {
   userJoinedEvent,
   userDeletedEvent,
 } from "../events/channels";
+import { WebsocketsService } from "./ws";
+import { getChannelRoom } from "../utils/channels";
+import { Logger, LoggerInterface } from "../decorators/logger";
 
 @Service()
 export class ChannelsService {
   constructor(
+    @Logger() private logger: LoggerInterface,
     private channelsRepository: ChannelsRepository,
-    private channelsRBACService: ChannelsRBACService
+    private channelsRBACService: ChannelsRBACService,
+    private websocketsService: WebsocketsService
   ) {}
 
   async create(creatorId: string, title: string): Promise<number> {
@@ -26,6 +31,7 @@ export class ChannelsService {
       creatorId,
       ChannelRole.OWNER
     );
+    this.websocketsService.addToRoom(creatorId, getChannelRoom(channelId));
     channelCreatedEvent.emit({
       creatorId,
       channelId,
@@ -50,6 +56,7 @@ export class ChannelsService {
       memberId,
       role
     );
+    this.websocketsService.addToRoom(memberId, getChannelRoom(channelId));
     userJoinedEvent.emit({
       userId: memberId,
       channelId,
@@ -92,9 +99,28 @@ export class ChannelsService {
       null,
       memberInfo.role
     );
+    this.websocketsService.removeFromRoom(memberId, getChannelRoom(channelId));
     userDeletedEvent.emit({
       userId: memberId,
       channelId,
     });
+  }
+
+  async subcribesUserToChannels(userId: string) {
+    const channelsBatchSize = 100;
+    let cursorId = null;
+    let channels = await this.channelsRepository.list(
+      userId,
+      channelsBatchSize
+    );
+    // TODO: change to generator
+    while (channels.length === channelsBatchSize && cursorId !== null) {
+      channels.forEach((c) => {
+        const channelRoom = getChannelRoom(c.id);
+        this.logger.info("User joined to room", { channelRoom });
+        this.websocketsService.addToRoom(userId, channelRoom);
+      });
+      cursorId = channels[channels.length - 1];
+    }
   }
 }
