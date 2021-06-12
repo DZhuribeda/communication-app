@@ -1,17 +1,18 @@
 import { Service } from "typedi";
 import { ChannelsRepository } from "./repositories/channels";
 import { ChannelRole, ChannelsRBACService } from "./rbac/channels";
-import {
-  channelCreatedEvent,
-  userJoinedEvent,
-  userDeletedEvent,
-} from "../events/channels";
+
+import { WebsocketsService } from "./ws";
+import { getChannelRoom } from "../utils/channels";
+import { Logger, LoggerInterface } from "../decorators/logger";
 
 @Service()
 export class ChannelsService {
   constructor(
+    @Logger() private logger: LoggerInterface,
     private channelsRepository: ChannelsRepository,
-    private channelsRBACService: ChannelsRBACService
+    private channelsRBACService: ChannelsRBACService,
+    private websocketsService: WebsocketsService
   ) {}
 
   async create(creatorId: string, title: string): Promise<number> {
@@ -26,10 +27,7 @@ export class ChannelsService {
       creatorId,
       ChannelRole.OWNER
     );
-    channelCreatedEvent.emit({
-      creatorId,
-      channelId,
-    });
+    this.websocketsService.addToRoom(creatorId, getChannelRoom(channelId));
 
     return channelId;
   }
@@ -50,10 +48,7 @@ export class ChannelsService {
       memberId,
       role
     );
-    userJoinedEvent.emit({
-      userId: memberId,
-      channelId,
-    });
+    this.websocketsService.addToRoom(memberId, getChannelRoom(channelId));
   }
 
   async changeMemberRole(
@@ -92,9 +87,24 @@ export class ChannelsService {
       null,
       memberInfo.role
     );
-    userDeletedEvent.emit({
-      userId: memberId,
-      channelId,
-    });
+    this.websocketsService.removeFromRoom(memberId, getChannelRoom(channelId));
+  }
+
+  async subcribesUserToChannels(userId: string) {
+    const channelsBatchSize = 100;
+    let cursorId = null;
+    let channels = await this.channelsRepository.list(
+      userId,
+      channelsBatchSize
+    );
+    // TODO: change to generator
+    while (channels.length === channelsBatchSize && cursorId !== null) {
+      channels.forEach((c) => {
+        const channelRoom = getChannelRoom(c.id);
+        this.logger.info("User joined to room", { channelRoom });
+        this.websocketsService.addToRoom(userId, channelRoom);
+      });
+      cursorId = channels[channels.length - 1];
+    }
   }
 }

@@ -1,10 +1,16 @@
 import { Service } from "typedi";
-import { messageCreatedEvent } from "../events/messages";
+import { Logger, LoggerInterface } from "../decorators/logger";
+import { getChannelRoom } from "../utils/channels";
 import { MessagesRepository } from "./repositories/messages";
+import { WebsocketsService } from "./ws";
 
 @Service()
 export class MessagesService {
-  constructor(private messagesRepository: MessagesRepository) {}
+  constructor(
+    @Logger() private logger: LoggerInterface,
+    private messagesRepository: MessagesRepository,
+    private websocketsService: WebsocketsService
+  ) {}
 
   async create(creatorId: string, channelId: number, text: string) {
     const message = await this.messagesRepository.create(
@@ -12,12 +18,18 @@ export class MessagesService {
       channelId,
       text
     );
-    messageCreatedEvent.emit({
+    const channelRoom = getChannelRoom(channelId);
+    this.logger.info("Emitted message:created event to room", {
+      userId: creatorId,
+      channelRoom,
+    });
+    const payload = {
       messageId: message.id,
       userId: creatorId,
-      channelId,
-      text,
-    });
+      text: text,
+      channelId: channelId,
+    };
+    this.websocketsService.emitMessage(channelRoom, "message:created", payload);
     return message.id;
   }
 }

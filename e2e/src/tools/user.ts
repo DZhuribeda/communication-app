@@ -19,6 +19,9 @@ export async function createUser(): Promise<User> {
   const flow = await fetch(
     `${TEST_CONFIG.base_url}/.ory/kratos/public/self-service/registration/api`
   );
+  if (!flow.ok) {
+    throw new Error(JSON.stringify(await flow.json(), null, 2));
+  }
   const flowData = await flow.json();
   const actionURL = flowData.ui.action;
   const firstName = faker.name.firstName();
@@ -38,6 +41,9 @@ export async function createUser(): Promise<User> {
     body: JSON.stringify(payload),
     headers: { "Content-Type": "application/json" },
   });
+  if (!userRegistrationResponse.ok) {
+    throw new Error(JSON.stringify(await userRegistrationResponse.json(), null, 2));
+  }
 
   const userRegistrationData = await userRegistrationResponse.json();
   // TODO: that's error sometimes, faker generate not so random user, we should add clean up if helper was used.
@@ -55,6 +61,9 @@ export async function loginUser(user: User): Promise<string> {
   const flow = await fetch(
     `${TEST_CONFIG.base_url}/.ory/kratos/public/self-service/login/api`
   );
+  if (!flow.ok) {
+    throw new Error(JSON.stringify(await flow.json(), null, 2));
+  }
   const flowData = await flow.json();
   const actionURL = flowData.ui.action;
   const payload = {
@@ -67,6 +76,9 @@ export async function loginUser(user: User): Promise<string> {
     body: JSON.stringify(payload),
     headers: { "Content-Type": "application/json" },
   });
+  if (!userLoginResponse.ok) {
+    throw new Error(JSON.stringify(await userLoginResponse.json(), null, 2));
+  }
 
   const userLoginData = await userLoginResponse.json();
   return userLoginData.session_token;

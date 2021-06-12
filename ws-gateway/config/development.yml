@@ -1,0 +1,8 @@
+- upstream:
+    url: "http://messages:5000/_/api/v1/wsEvents/"
+    headers:
+      - X-User
+      - Authorization
+  match:
+    namespace: /messages
+  

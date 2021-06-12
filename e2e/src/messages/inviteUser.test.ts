@@ -17,7 +17,7 @@ beforeEach((done) => {
     .then((user) => {
       author = user;
       socketAuthor = io(`${TEST_CONFIG.base_url}/messages`, {
-        path: "/ws/messages",
+        path: "/ws/",
         transports: ["websocket"],
         extraHeaders: {
           Authorization: `Bearer ${author.token}`,
@@ -31,7 +31,7 @@ beforeEach((done) => {
     .then((user) => {
       guest = user;
       socketGuest = io(`${TEST_CONFIG.base_url}/messages`, {
-        path: "/ws/messages",
+        path: "/ws/",
         transports: ["websocket"],
         extraHeaders: {
           Authorization: `Bearer ${guest.token}`,
@@ -54,9 +54,11 @@ test("guest can receive messages", (done) => {
   let channelId: number;
 
   socketAuthor.on("message:created", () => {
+    console.log("author receive message");
     partialDone();
   });
   socketGuest.on("message:created", () => {
+    console.log("guest receive message");
     partialDone();
   });
   createChannel(author.token)

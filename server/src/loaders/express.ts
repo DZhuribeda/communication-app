@@ -7,7 +7,6 @@ import AuthService from "../services/auth";
 export default ({ app }: { app: express.Application }) => {
   useContainer(Container);
   useExpressServer(app, {
-    routePrefix: '/api/v1',
     controllers: [path.dirname(__dirname) + "/controllers/*.ts"],
     authorizationChecker: async (action: Action, roles: string[]) => {
       const authHeader = action.request.headers["authorization"];
@@ -23,7 +22,8 @@ export default ({ app }: { app: express.Application }) => {
         return true;
       }
       // TODO: Find better way to extract resourceId
-      const resourceId = action.request.params.channelId;
+      const resourceId =
+        action.request.params.channelId || action.request.body?.channelId;
       return authService.authorize(user.id, resourceId, roles);
     },
     currentUserChecker: async (action: Action) => {

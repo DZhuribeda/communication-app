@@ -11,7 +11,7 @@ beforeEach((done) => {
   createAuthorizedUser().then((user) => {
     authorizedUser = user;
     socket = io(`${TEST_CONFIG.base_url}/messages`, {
-      path: "/ws/messages",
+      path: "/ws/",
       transports: ["websocket"],
       extraHeaders: {
         Authorization: `Bearer ${authorizedUser.token}`,

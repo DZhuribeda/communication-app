@@ -10,12 +10,7 @@ if (envFound.error) {
   throw new Error("⚠️  Couldn't find .env file  ⚠️");
 }
 
-const requiredEnv = [
-  "JWKS_URI",
-  "KETO_WRITE_URL",
-  "KETO_READ_URL",
-  "WS_GATEWAY_GRPC_URI",
-];
+const requiredEnv = ["JWKS_URI", "REDIS_URL"];
 requiredEnv.forEach((envVariable) => {
   const envVariableValue = process.env[envVariable];
   if (!envVariableValue) {
@@ -25,14 +20,12 @@ requiredEnv.forEach((envVariable) => {
 
 export default {
   port: parseInt(process.env.PORT || "", 10),
+  grpcPort: parseInt(process.env.GRPC_PORT || "", 10),
   log: {
     level: process.env.LOG_LEVEL,
   },
 
+  redisUrl: process.env.REDIS_URL as string,
   jwksUri: process.env.JWKS_URI as string,
-  wsGatewayGrpcUri: process.env.WS_GATEWAY_GRPC_URI as string,
-  keto: {
-    write_url: process.env.KETO_WRITE_URL as string,
-    read_url: process.env.KETO_READ_URL as string,
-  },
+  eventRules: process.env.EVENT_RULES as string,
 };
