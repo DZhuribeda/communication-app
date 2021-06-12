@@ -1,6 +1,5 @@
 import { Service } from "typedi";
 import { Logger, LoggerInterface } from "../decorators/logger";
-import { messageCreatedEvent } from "../events/messages";
 import { getChannelRoom } from "../utils/channels";
 import { MessagesRepository } from "./repositories/messages";
 import { WebsocketsService } from "./ws";
@@ -19,12 +18,6 @@ export class MessagesService {
       channelId,
       text
     );
-    messageCreatedEvent.emit({
-      messageId: message.id,
-      userId: creatorId,
-      channelId,
-      text,
-    });
     const channelRoom = getChannelRoom(channelId);
     this.logger.info("Emitted message:created event to room", {
       userId: creatorId,

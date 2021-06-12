@@ -1,11 +1,7 @@
 import { Service } from "typedi";
 import { ChannelsRepository } from "./repositories/channels";
 import { ChannelRole, ChannelsRBACService } from "./rbac/channels";
-import {
-  channelCreatedEvent,
-  userJoinedEvent,
-  userDeletedEvent,
-} from "../events/channels";
+
 import { WebsocketsService } from "./ws";
 import { getChannelRoom } from "../utils/channels";
 import { Logger, LoggerInterface } from "../decorators/logger";
@@ -32,10 +28,6 @@ export class ChannelsService {
       ChannelRole.OWNER
     );
     this.websocketsService.addToRoom(creatorId, getChannelRoom(channelId));
-    channelCreatedEvent.emit({
-      creatorId,
-      channelId,
-    });
 
     return channelId;
   }
@@ -57,10 +49,6 @@ export class ChannelsService {
       role
     );
     this.websocketsService.addToRoom(memberId, getChannelRoom(channelId));
-    userJoinedEvent.emit({
-      userId: memberId,
-      channelId,
-    });
   }
 
   async changeMemberRole(
@@ -100,10 +88,6 @@ export class ChannelsService {
       memberInfo.role
     );
     this.websocketsService.removeFromRoom(memberId, getChannelRoom(channelId));
-    userDeletedEvent.emit({
-      userId: memberId,
-      channelId,
-    });
   }
 
   async subcribesUserToChannels(userId: string) {

@@ -1,6 +1,5 @@
 import * as grpc from "@grpc/grpc-js";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
-import { Struct, Value } from "google-protobuf/google/protobuf/struct_pb";
 import { Service } from "typedi";
 import config from "../config";
 import { WebsocketsClient } from "../proto/ws_grpc_pb";

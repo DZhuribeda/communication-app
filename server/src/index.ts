@@ -1,17 +1,12 @@
 import "reflect-metadata";
 import config from "./config";
 import Logger from "./logger";
-import { createServer } from "./app";
+import { createApp } from "./app";
+import express from "express";
 
-createServer().then((httpServer) => {
-  httpServer
-    .listen(config.port, () => {
-      Logger.info("Server is running", {
-        port: config.port,
-      });
-    })
-    .on("error", (err: Error) => {
-      Logger.error(err);
-      process.exit(1);
-    });
+createApp().then((app: express.Application) => {
+  app.listen(config.port);
+  Logger.info("Server is running", {
+    port: config.port,
+  });
 });
