@@ -89,7 +89,6 @@ jobs:
 
   push-to-registry:
     needs: run-linters
-    if: github.ref == 'refs/heads/master'
     name: Push Docker image to GitHub Container Registry
     runs-on: ubuntu-latest
     steps:
