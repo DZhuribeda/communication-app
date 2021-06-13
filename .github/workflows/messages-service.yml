@@ -63,6 +63,7 @@ jobs:
           branch: ${{ github.head_ref }}
     
   run-linters:
+    if: always()
     needs: autoformat
     name: Run linters
     runs-on: ubuntu-latest
