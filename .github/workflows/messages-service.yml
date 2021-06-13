@@ -109,6 +109,6 @@ jobs:
         with:
           push: ${{ github.ref == 'refs/heads/master' }}
           context: messages
-          tags: ghcr.io/${{ github.repository }}/messages:${{ github.sha }}
+          tags: ghcr.io/dzhuribeda/communication-app/messages:${{ github.sha }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
