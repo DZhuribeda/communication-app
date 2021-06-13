@@ -1,6 +1,9 @@
 name: Messages Service
 on: push
-
+defaults:
+  run:
+    shell: bash
+    working-directory: messages
 jobs:
   build:
     runs-on: ubuntu-latest
