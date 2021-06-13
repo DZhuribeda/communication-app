@@ -19,11 +19,11 @@ services:
       - JWKS_URI=http://oathkeeper:4456/.well-known/jwks.json
       - WS_GATEWAY_GRPC_URI=ws-gateway:5002
     build:
-      context: ./server
+      context: ./messages
     ports:
       - 5000:5000
     volumes:
-      - ./server:/app
+      - ./messages:/app
       - /app/node_modules
   ws-gateway:
     links:

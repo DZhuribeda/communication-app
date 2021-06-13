@@ -20,4 +20,4 @@ function build_proto {
 } 
 
 build_proto proto/ws.proto ./../ws-gateway/src/proto
-build_proto proto/ws.proto ./../server/src/proto
+build_proto proto/ws.proto ./../messages/src/proto
