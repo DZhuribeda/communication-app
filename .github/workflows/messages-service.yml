@@ -36,7 +36,6 @@ jobs:
     needs: install
     name: Autoformat with prettier
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
         # with:
@@ -63,7 +62,6 @@ jobs:
           branch: ${{ github.head_ref }}
     
   run-linters:
-    if: always()
     needs: autoformat
     name: Run linters
     runs-on: ubuntu-latest
