@@ -1,13 +1,11 @@
 version: "3.7"
 
 services:
-  auth-ui:
+  frontend:
     build:
-      context: ./auth-ui
-    ports:
-      - 3000:3000
+      context: ./frontend
     volumes:
-      - ./auth-ui:/app
+      - ./frontend:/app
       - /app/node_modules
   messages:
     links:
