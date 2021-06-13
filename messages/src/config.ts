@@ -29,10 +29,6 @@ export default {
     level: process.env.LOG_LEVEL,
   },
 
-
-
-  
-
   jwksUri: process.env.JWKS_URI as string,
   wsGatewayGrpcUri: process.env.WS_GATEWAY_GRPC_URI as string,
   keto: {
