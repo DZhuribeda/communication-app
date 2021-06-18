@@ -3,12 +3,10 @@ import Link from "next/link";
 import config from "@lib/config";
 import { QueryClient } from "react-query";
 import { dehydrate } from "react-query/hydration";
-import { prefetchUser, userAtom, useUser } from "@lib/store/user";
-import { useAtom } from "jotai";
+import { prefetchUser, useUser } from "@lib/store/user";
 
 export default function Home() {
   const user = useUser();
-  // const [user] = useAtom(userAtom)
   console.log(user);
   return (
     <div>

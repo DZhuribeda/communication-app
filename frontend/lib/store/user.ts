@@ -1,6 +1,5 @@
 import { GetServerSidePropsContext } from "next";
 import { QueryClient, useQuery } from "react-query";
-import { atomWithQuery } from "jotai/query";
 
 import { kratos } from "@lib/auth/kratos";
 import config from "@lib/config";
@@ -31,19 +30,6 @@ export interface User {
     };
   };
 }
-
-export const userAtom = atomWithQuery(() => ({
-  queryKey: ["user"],
-  queryFn: () => {
-    return fetch(`${config.kratos.public}/sessions/whoami`, {
-      credentials: "include",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        return (data?.identity as User) ?? null;
-      });
-  },
-}));
 
 export function useUser() {
   const { data } = useQuery("user", () =>

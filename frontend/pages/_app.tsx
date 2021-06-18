@@ -1,6 +1,6 @@
 import "tailwindcss/tailwind.css";
 import type { AppProps /*, AppContext */ } from "next/app";
-import React from "react";
+import React, { Suspense } from "react";
 import Head from "next/head";
 import { ThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -27,7 +27,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <QueryProvider dehydratedState={pageProps.dehydratedState}>
-          <Component {...pageProps} />
+          <Suspense fallback={'Loading...'}>
+            <Component {...pageProps} />
+          </Suspense>
         </QueryProvider>
       </ThemeProvider>
     </React.Fragment>
