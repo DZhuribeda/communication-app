@@ -51,7 +51,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     console.log("No flow ID found in URL, initializing registration flow.");
     return {
       redirect: {
-        destination: `${config.kratos.browser}/self-service/registration/browser`,
+        destination: `${config.kratos.public}/self-service/registration/browser`,
         permanent: false,
       },
     };

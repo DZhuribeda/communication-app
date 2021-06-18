@@ -11,7 +11,7 @@ export default function Home({ user }) {
         {user ? `${user?.traits.name.first} ${user?.traits.name.last}` : null}
       </div>
       {user ? (
-        <a href={`${config.kratos.browser}/self-service/browser/flows/logout`}>
+        <a href={`${config.kratos.public}/self-service/browser/flows/logout`}>
           Log out
         </a>
       ) : (

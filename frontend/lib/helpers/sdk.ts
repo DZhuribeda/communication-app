@@ -28,7 +28,7 @@ export const redirectOnSoftError = (
     ) {
         return {
             redirect: {
-                destination: `${config.kratos.browser}${redirectTo}`,
+                destination: `${config.kratos.public}${redirectTo}`,
                 permanent: false,
             },
         };

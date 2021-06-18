@@ -21,24 +21,6 @@
     - handler: noop
 
 -
-  id: "frontend:anonymous"
-  upstream:
-    preserve_host: true
-    url: "http://frontend:3000"
-  match:
-    url: "http://127.0.0.1:4455/<{error,recovery,verify,auth/*,**.css,**.js,**.json,_next/webpack-hmr**}{/,}>"
-    methods:
-      - GET
-  authenticators:
-    -
-      handler: anonymous
-  authorizer:
-    handler: allow
-  mutators:
-    -
-      handler: noop
-
--
   id: "server:protected"
   upstream:
     preserve_host: true
@@ -59,9 +41,7 @@
     - handler: header
     - handler: id_token
   errors:
-    - handler: redirect
-      config:
-        to: http://127.0.0.1:4455/auth/login
+    - handler: json
 
 
 -
@@ -85,6 +65,4 @@
     - handler: header
     - handler: id_token
   errors:
-    - handler: redirect
-      config:
-        to: http://127.0.0.1:4455/auth/login
+    - handler: json
