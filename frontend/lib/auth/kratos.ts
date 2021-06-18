@@ -1,6 +1,6 @@
 import { Configuration, PublicApi } from '@ory/kratos-client';
 import { GetServerSidePropsContext } from 'next';
-import config from './config';
+import config from '../config';
 
 export const kratos = new PublicApi(new Configuration({ basePath: config.kratos.public }));
 

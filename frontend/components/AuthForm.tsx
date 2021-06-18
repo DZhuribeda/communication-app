@@ -5,7 +5,7 @@ import {
   UiNode,
   UiNodeInputAttributes,
 } from "@ory/kratos-client";
-import { getNodeName, getNodeTitle } from "../lib/helpers/form";
+import { getNodeName, getNodeTitle } from "@lib/auth/form";
 
 function FormField({ node }: { node: UiNode }) {
   switch (node.type) {

@@ -1,12 +1,17 @@
 version: v0.6.0-alpha.1
 
 serve:
+  admin:
+    base_url: http://kratos:4434/
   public:
     base_url: http://127.0.0.1:4455/.ory/kratos/public/
     cors:
-      enabled: true
-  admin:
-    base_url: http://kratos:4434/
+      enabled: false
+      # debug: true
+      # allow_credentials: true
+      # allowed_origins:
+      #   - http://localhost:3000
+      #   - http://127.0.0.1:3000
 
 selfservice:
   default_browser_return_url: http://127.0.0.1:3000/

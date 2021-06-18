@@ -1,11 +1,11 @@
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
-
-import config from "../../lib/config";
-import { kratos } from "../../lib/kratos";
-import { AuthForm } from "../../components/AuthForm";
-import { isString, redirectOnSoftError } from "../../lib/helpers/sdk";
 import { LoginFlow } from "@ory/kratos-client";
+
+import config from "@lib/config";
+import { kratos } from "@lib/auth/kratos";
+import { isString, redirectOnSoftError } from "@lib/auth/sdk";
+import { AuthForm } from "@components/AuthForm";
 
 export default function LoginPage({ flow }: { flow: LoginFlow }) {
   return (

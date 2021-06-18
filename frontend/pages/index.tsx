@@ -1,9 +1,15 @@
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
-import config from "../lib/config";
-import { getCurrentUserIdentity } from "../lib/kratos";
+import config from "@lib/config";
+import { QueryClient } from "react-query";
+import { dehydrate } from "react-query/hydration";
+import { prefetchUser, userAtom, useUser } from "@lib/store/user";
+import { useAtom } from "jotai";
 
-export default function Home({ user }) {
+export default function Home() {
+  const user = useUser();
+  // const [user] = useAtom(userAtom)
+  console.log(user);
   return (
     <div>
       <div>
@@ -25,9 +31,12 @@ export default function Home({ user }) {
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const queryClient = new QueryClient();
+  await prefetchUser(queryClient, context);
+
   return {
     props: {
-      user: await getCurrentUserIdentity(context),
+      dehydratedState: dehydrate(queryClient),
     },
   };
 }

@@ -4,7 +4,8 @@ import React from "react";
 import Head from "next/head";
 import { ThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import theme from "../lib/theme";
+import theme from "@lib/theme";
+import QueryProvider from "@components/provider/QueryClient";
 
 function MyApp({ Component, pageProps }: AppProps) {
   React.useEffect(() => {
@@ -24,9 +25,10 @@ function MyApp({ Component, pageProps }: AppProps) {
         />
       </Head>
       <ThemeProvider theme={theme}>
-        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
-        <Component {...pageProps} />
+        <QueryProvider dehydratedState={pageProps.dehydratedState}>
+          <Component {...pageProps} />
+        </QueryProvider>
       </ThemeProvider>
     </React.Fragment>
   );
