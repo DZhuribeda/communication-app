@@ -3,21 +3,27 @@ import { QueryClient, useQuery } from "react-query";
 
 import { kratos } from "@lib/auth/kratos";
 import config from "@lib/config";
+import { UnauthorizedUser } from "@lib/exceptions";
 
 export async function prefetchUser(
   queryClient: QueryClient,
-  context: GetServerSidePropsContext
+  context: GetServerSidePropsContext,
+  options = {
+    required: true,
+  }
 ) {
-  await queryClient.prefetchQuery("user", async () => {
-    try {
-      const { data } = await kratos.whoami(
-        context?.req.headers.cookie,
-        context?.req.headers.authorization
-      );
-      return data?.identity as User;
-    } catch (e) {}
-    return null;
-  });
+  try {
+    const { data } = await kratos.whoami(
+      context?.req.headers.cookie,
+      context?.req.headers.authorization
+    );
+    if (options.required && data == null) {
+      throw new UnauthorizedUser();
+    }
+    queryClient.setQueryData("user", data?.identity as User);
+  } catch (e) {
+    throw new UnauthorizedUser();
+  }
 }
 
 export interface User {
@@ -41,6 +47,5 @@ export function useUser() {
         return (data?.identity as User) ?? null;
       })
   );
-  console.log(data);
   return data;
 }

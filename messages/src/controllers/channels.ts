@@ -54,14 +54,12 @@ export class ChannelsController {
 
   @Get()
   getAll(@QueryParams() query: ChannelsListQuery, @UserId() userId: string) {
-    console.log("channels");
     return this.channelsRepository.list(userId, query.pageSize, query.cursor);
   }
 
   @Authorized(createRole(CHANNEL_NAMESPACE, ChannelAction.READ))
   @Get(":channelId/")
   getOne(@Param("channelId") channelId: number) {
-    console.log(channelId);
     return this.channelsRepository.get(channelId);
   }
 
