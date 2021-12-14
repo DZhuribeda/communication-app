@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   kratos-migrate:
-    image: oryd/kratos:v0.6.3-alpha.1
+    image: oryd/kratos:v0.8.1-alpha.1
     environment:
       - DSN=postgres://kratos:secret@postgresd:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4
     volumes:
@@ -15,7 +15,7 @@ services:
   kratos:
     depends_on:
       - kratos-migrate
-    image: oryd/kratos:v0.6.3-alpha.1
+    image: oryd/kratos:v0.8.1-alpha.1
     ports:
       - "4433:4433" # public
       - "4434:4434" # admin
@@ -50,18 +50,20 @@ services:
       - ./oathkeeper:/etc/config/oathkeeper
 
   keto-migrate:
-    image: oryd/keto:v0.6.0-alpha.1
+    image: oryd/keto:v0.7.0-alpha.1
     links:
       - postgresd:postgresd
     volumes:
       - ./keto:/etc/config/keto
+      - ./keto:/home/ory
     environment:
       - LOG_LEVEL=debug
-    command: migrate sql postgres://keto:secret@postgresd:5432/keto?sslmode=disable
+      - DSN=postgres://keto:secret@postgresd:5432/keto?sslmode=disable
+    command: migrate up -y
     restart: on-failure
 
   keto:
-    image: oryd/keto:v0.6.0-alpha.1
+    image: oryd/keto:v0.7.0-alpha.1
     ports:
       - "4466:4466"
       - "4467:4467"
@@ -77,6 +79,7 @@ services:
       - keto-migrate
     volumes:
       - ./keto:/etc/config/keto
+      - ./keto:/home/ory
       - /keto_namespaces
 
   postgresd:
