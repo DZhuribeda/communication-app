@@ -95,3 +95,15 @@ services:
 
   redis:
     image: redis:6.2.4
+
+  server:
+    build:
+        context: ./server
+        target: development
+        dockerfile: ./Dockerfile
+    command: npm run start:dev
+    ports:
+        - 3001:3000
+        - 9229:9229
+    volumes:
+        - ./server:/usr/src/app
