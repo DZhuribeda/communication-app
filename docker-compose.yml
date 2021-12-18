@@ -97,11 +97,12 @@ services:
     image: redis:6.2.4
 
   server:
+    tty: true
     build:
         context: ./server
         target: development
         dockerfile: ./Dockerfile
-    command: npm run start:dev
+    command: npm run start:debug
     ports:
         - 3001:3000
         - 9229:9229
