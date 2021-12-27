@@ -40,3 +40,26 @@
     - handler: id_token
   errors:
     - handler: json
+
+-
+  id: "ws-server:protected"
+  upstream:
+    preserve_host: true
+    url: "http://server:3000"
+  match:
+    url: "http://127.0.0.1:4455/socket.io/<**>"
+    methods:
+      - GET
+      - POST
+      - DELETE
+      - PATCH
+  authenticators:
+    - handler: cookie_session
+    - handler: bearer_token
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: header
+    - handler: id_token
+  errors:
+    - handler: json

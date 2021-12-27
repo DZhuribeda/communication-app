@@ -98,6 +98,10 @@ services:
 
   server:
     tty: true
+    environment:
+      DEBUG: "mediasoup:*"
+      MEDIASOUP_LISTEN_IP: 172.19.0.2
+      MEDIASOUP_ANNOUNCED_IP: 192.168.1.187
     build:
         context: ./server
         target: development
@@ -106,5 +110,7 @@ services:
     ports:
         - 3001:3000
         - 9229:9229
+        - 40000-40020:40000-40020/tcp
+        - 40000-40020:40000-40020/udp
     volumes:
         - ./server:/usr/src/app
