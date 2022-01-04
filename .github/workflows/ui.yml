@@ -116,7 +116,7 @@ jobs:
         run:  npm run lint
 
   jest-rtl:
-    needs: [run-linters, run-prettier]
+    needs: [run-lint, run-prettier]
     name: Run jest tests
     runs-on: ubuntu-latest
 
