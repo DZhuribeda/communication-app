@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 
 import { kratos } from "../libs/auth/kratos";
 
+
+
+
 const Login: NextPage = () => {
   const [error, setError] = useState<SelfServiceError | string>();
 
