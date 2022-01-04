@@ -5,10 +5,10 @@ import { useStore } from "../libs/store/useStore";
 import { SelfView } from "./../components/media/SelfView";
 
 const Home: NextPage = () => {
-  const joinToRoom = useStore((state) => state.joinToRoom);
-  useEffect(() => {
-    joinToRoom();
-  }, []);
+  // const joinToRoom = useStore((state) => state.joinToRoom);
+  // useEffect(() => {
+  //   joinToRoom();
+  // }, []);
 
   return (
     <div>
