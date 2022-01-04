@@ -34,7 +34,7 @@ jobs:
         run: npm ci
   autoformat:
     needs: install
-    name: Autoformat with prettier
+    name: Autoformat code
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
