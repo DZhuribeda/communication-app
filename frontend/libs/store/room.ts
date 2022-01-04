@@ -1,8 +1,13 @@
-import { DtlsParameters, IceCandidate, IceParameters, RtpCapabilities, SctpParameters } from "mediasoup-client/lib/types";
+import {
+  DtlsParameters,
+  IceCandidate,
+  IceParameters,
+  RtpCapabilities,
+  SctpParameters,
+} from "mediasoup-client/lib/types";
 import { SetState, GetState } from "zustand";
 import { AppState } from "./useStore";
-import { asyncEmit, socket } from '../socket';
-
+import { asyncEmit, socket } from "../socket";
 
 const produce = true;
 const consume = true;
@@ -13,19 +18,24 @@ type JoinToRoomResponse = {
   roomId: string;
   participants: string[];
   rtpCapabilities: RtpCapabilities;
-}
+};
 
 export interface RoomSlice {
   roomId: string;
   joinToRoom: () => Promise<void>;
 }
 
-export const createRoomSlice = (set: SetState<AppState>, get: GetState<AppState>) => ({
-  roomId: 'testing',
+export const createRoomSlice = (
+  set: SetState<AppState>,
+  get: GetState<AppState>
+) => ({
+  roomId: "testing",
   joinToRoom: async () => {
     const roomId = get().roomId;
-    const data = await asyncEmit<JoinToRoomResponse>(socket, 'joinToRoom', { roomId });
-    const device = await (get().createDevice(data.rtpCapabilities));
+    const data = await asyncEmit<JoinToRoomResponse>(socket, "joinToRoom", {
+      roomId,
+    });
+    const device = await get().createDevice(data.rtpCapabilities);
     if (produce) {
       const {
         id,
@@ -34,19 +44,17 @@ export const createRoomSlice = (set: SetState<AppState>, get: GetState<AppState>
         dtlsParameters,
         sctpParameters,
       } = await asyncEmit<{
-        id: string,
-        iceParameters: IceParameters,
-        iceCandidates: IceCandidate[],
-        dtlsParameters: DtlsParameters,
-        sctpParameters?: SctpParameters,
-      }>(socket, 'createWebRtcTransport', {
+        id: string;
+        iceParameters: IceParameters;
+        iceCandidates: IceCandidate[];
+        dtlsParameters: DtlsParameters;
+        sctpParameters?: SctpParameters;
+      }>(socket, "createWebRtcTransport", {
         roomId,
         forceTcp: forceTcp,
         producing: true,
         consuming: false,
-        sctpCapabilities: useDataChannel
-          ? device.sctpCapabilities
-          : undefined
+        sctpCapabilities: useDataChannel ? device.sctpCapabilities : undefined,
       });
       await get().createProducerWebRtcTransport({
         id,
@@ -64,19 +72,17 @@ export const createRoomSlice = (set: SetState<AppState>, get: GetState<AppState>
         dtlsParameters,
         sctpParameters,
       } = await asyncEmit<{
-        id: string,
-        iceParameters: IceParameters,
-        iceCandidates: IceCandidate[],
-        dtlsParameters: DtlsParameters,
-        sctpParameters?: SctpParameters,
-      }>(socket, 'createWebRtcTransport', {
+        id: string;
+        iceParameters: IceParameters;
+        iceCandidates: IceCandidate[];
+        dtlsParameters: DtlsParameters;
+        sctpParameters?: SctpParameters;
+      }>(socket, "createWebRtcTransport", {
         roomId,
         forceTcp: forceTcp,
         producing: false,
         consuming: true,
-        sctpCapabilities: useDataChannel
-          ? device.sctpCapabilities
-          : undefined
+        sctpCapabilities: useDataChannel ? device.sctpCapabilities : undefined,
       });
       await get().createConsumerWebRtcTransport({
         id,
@@ -86,22 +92,19 @@ export const createRoomSlice = (set: SetState<AppState>, get: GetState<AppState>
         sctpParameters,
       });
     }
-    console.log('rtpCapabilities', device.rtpCapabilities)
-    const { peers } = await asyncEmit<{ peers: any[] }>(socket, 'join', {
+    console.log("rtpCapabilities", device.rtpCapabilities);
+    const { peers } = await asyncEmit<{ peers: any[] }>(socket, "join", {
       roomId,
       // TODO: change to name
-      displayName: 'username',
+      displayName: "username",
       // device          : this._device,
-      rtpCapabilities: consume
-        ? device.rtpCapabilities
-        : undefined,
-      sctpCapabilities: useDataChannel && consume
-        ? device.sctpCapabilities
-        : undefined
+      rtpCapabilities: consume ? device.rtpCapabilities : undefined,
+      sctpCapabilities:
+        useDataChannel && consume ? device.sctpCapabilities : undefined,
     });
-    peers.forEach(peer => {
+    peers.forEach((peer) => {
       get().addPeer(peer);
-    }); 
+    });
 
     // store.dispatch(
     //     stateActions.setRoomState('connected'));
@@ -139,14 +142,14 @@ export const createRoomSlice = (set: SetState<AppState>, get: GetState<AppState>
 
       const sendTransport = get().sendTransport;
       if (!sendTransport) {
-        throw new Error('No sendTransport');
+        throw new Error("No sendTransport");
       }
-      sendTransport.on('connectionstatechange', (connectionState) => {
-        if (connectionState === 'connected') {
+      sendTransport.on("connectionstatechange", (connectionState) => {
+        if (connectionState === "connected") {
           // TODO
           // this.enableChatDataProducer();
         }
       });
     }
-  }
+  },
 });
