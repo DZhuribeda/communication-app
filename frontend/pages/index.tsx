@@ -1,4 +1,3 @@
-
 import type { NextPage } from "next";
 import { useEffect } from "react";
 import { Peers } from "../components/media/Peers";
@@ -6,7 +5,7 @@ import { useStore } from "../libs/store/useStore";
 import { SelfView } from "./../components/media/SelfView";
 
 const Home: NextPage = () => {
-  const joinToRoom = useStore(state => state.joinToRoom);
+  const joinToRoom = useStore((state) => state.joinToRoom);
   useEffect(() => {
     joinToRoom();
   }, []);
@@ -22,7 +21,7 @@ const Home: NextPage = () => {
         Peers
         <Peers />
       </div>
-    </div >
+    </div>
   );
 };
 
