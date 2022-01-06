@@ -1,3 +1,4 @@
 {
+  "ignorePatterns": ["./styles/globals.css"],
   "extends": ["next/core-web-vitals", "prettier"]
 }
