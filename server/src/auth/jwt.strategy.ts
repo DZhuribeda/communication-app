@@ -21,13 +21,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       }),
 
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      algorithms: ['RS256'], 
+      algorithms: ['RS256'],
     });
   }
 
   validate(payload: Payload) {
     return {
       id: payload.session.identity.id,
-    }; 
+    };
   }
 }
