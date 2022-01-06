@@ -57,7 +57,7 @@ jobs:
       - name: Install Dependencies
         run: npm ci
       - name: Check formatting
-        run:  npx prettier --check .
+        run: npx prettier --check src test
 
   run-lint:
     needs: install
