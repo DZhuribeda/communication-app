@@ -9,31 +9,33 @@ type Payload = {
   session: Session;
 };
 
-const AUTH_HEADER = "authorization";
+const AUTH_HEADER = 'authorization';
 const BEARER_AUTH_SCHEME = 'bearer';
 
-var re = /(\S+)\s+(\S+)/;
-
+const re = /(\S+)\s+(\S+)/;
 
 function parseAuthHeader(hdrValue) {
-    if (typeof hdrValue !== 'string') {
-        return null;
-    }
-    var matches = hdrValue.match(re);
-    return matches && { scheme: matches[1], value: matches[2] };
+  if (typeof hdrValue !== 'string') {
+    return null;
+  }
+  const matches = hdrValue.match(re);
+  return matches && { scheme: matches[1], value: matches[2] };
 }
 
 function extractFromSocketAuthHeaderAsBearerToken(socket: any) {
   let token = null;
   const headers = socket.handshake.headers;
   if (headers[AUTH_HEADER]) {
-      const auth_params = parseAuthHeader(headers[AUTH_HEADER]);
-      if (auth_params && BEARER_AUTH_SCHEME === auth_params.scheme.toLowerCase()) {
-          token = auth_params.value;
-      }
+    const auth_params = parseAuthHeader(headers[AUTH_HEADER]);
+    if (
+      auth_params &&
+      BEARER_AUTH_SCHEME === auth_params.scheme.toLowerCase()
+    ) {
+      token = auth_params.value;
+    }
   }
   return token;
-};
+}
 
 @Injectable()
 export class WsJwtStrategy extends PassportStrategy(Strategy, 'ws-jwt') {
@@ -47,13 +49,13 @@ export class WsJwtStrategy extends PassportStrategy(Strategy, 'ws-jwt') {
       }),
 
       jwtFromRequest: extractFromSocketAuthHeaderAsBearerToken,
-      algorithms: ['RS256'], 
+      algorithms: ['RS256'],
     });
   }
 
   validate(payload: Payload) {
     return {
       id: payload.session.identity.id,
-    }; 
+    };
   }
 }

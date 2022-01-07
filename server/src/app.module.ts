@@ -7,7 +7,13 @@ import { VideoModule } from './video/video.module';
 import { RoomsModule } from './rooms/rooms.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, VideoModule, VideoModule, RoomsModule],
+  imports: [
+    ConfigModule.forRoot(),
+    AuthModule,
+    VideoModule,
+    VideoModule,
+    RoomsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

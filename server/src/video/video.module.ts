@@ -6,17 +6,20 @@ import { Worker } from 'mediasoup/node/lib/Worker';
 import { mediasoupConfig } from './config';
 
 @Module({
-  providers: [VideoGateway, MediaService, {
-    provide: Worker,
-    useFactory: async () => {
-      return await createWorker({
-        logLevel: mediasoupConfig.workerSettings.logLevel,
-        logTags: mediasoupConfig.workerSettings.logTags,
-        rtcMinPort: Number(mediasoupConfig.workerSettings.rtcMinPort),
-        rtcMaxPort: Number(mediasoupConfig.workerSettings.rtcMaxPort)
-      });
+  providers: [
+    VideoGateway,
+    MediaService,
+    {
+      provide: Worker,
+      useFactory: async () => {
+        return await createWorker({
+          logLevel: mediasoupConfig.workerSettings.logLevel,
+          logTags: mediasoupConfig.workerSettings.logTags,
+          rtcMinPort: Number(mediasoupConfig.workerSettings.rtcMinPort),
+          rtcMaxPort: Number(mediasoupConfig.workerSettings.rtcMaxPort),
+        });
+      },
     },
-  }],
+  ],
 })
-export class VideoModule { }
-
+export class VideoModule {}
