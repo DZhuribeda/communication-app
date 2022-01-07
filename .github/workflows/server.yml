@@ -5,6 +5,9 @@ on:
       - server/**
       - .github/workflows/server.yml
 
+env:
+  MEDIASOUP_WORKER_BIN: /dev/null
+
 defaults:
   run:
     shell: bash
