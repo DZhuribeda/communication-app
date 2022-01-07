@@ -11,10 +11,11 @@ jobs:
       - name: Build the stack
         run: docker-compose up -d
       - name: Build UI
-        run:
-        - cd frontend
-        - npm ci
-        - npm run build
-        - npm run start &
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+          npm run start &
       - name: Cypress run
+        working-directory: cypress
         uses: cypress-io/github-action@v2
