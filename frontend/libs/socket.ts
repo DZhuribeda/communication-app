@@ -4,6 +4,7 @@ import { useStore } from "./store/useStore";
 // TODO: config
 export const socket = io("http://127.0.0.1:4455", {
   withCredentials: true,
+  reconnection: false,
 });
 socket.on("connect", () => {
   console.log(socket.id); // x8WIv7-mJelg7on_ALbx

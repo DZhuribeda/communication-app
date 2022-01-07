@@ -26,7 +26,7 @@ export function handleGetFlowError<S>(
         return;
       case "self_service_flow_return_to_forbidden":
         // The flow expired, let's request a new one.
-        toast.error("The return_to address is not allowed.");
+        // toast.error("The return_to address is not allowed.");
         resetFlow(undefined);
         await router.push("/" + flowType);
         return;
