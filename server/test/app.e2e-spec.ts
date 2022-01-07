@@ -1,5 +1,6 @@
 import * as request from 'supertest';
 import { Test } from '@nestjs/testing';
+import { Worker } from 'mediasoup/node/lib/Worker';
 import { AppModule } from './../src/app.module';
 import { INestApplication } from '@nestjs/common';
 
@@ -9,15 +10,18 @@ describe('AppController (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(Worker)
+      .useClass(jest.fn())
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
   });
 
-  it('/ (GET)', () => {
+  it('/api/v1 (GET)', () => {
     return request(app.getHttpServer())
-      .get('/')
+      .get('/api/v1')
       .expect(200)
       .expect('Hello World!');
   });
