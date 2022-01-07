@@ -4,6 +4,6 @@ describe('basic', () => {
   })
 
   it('intro', () => {
-    cy.get('h1').should('have.text', 'Hello world!')
+    cy.findByText('Hello world!').should('exist')
   })
 })
