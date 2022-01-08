@@ -16,7 +16,7 @@ export function NodeInputSubmit<T>({
       {...register(attributes.name, {
         required: attributes.required,
       })}
-      type='submit'
+      type="submit"
       size={Size.md}
       value={attributes.value || ""}
       disabled={attributes.disabled || disabled}

@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 import classNames from "classnames";
-import NextLink from 'next/link';
+import NextLink from "next/link";
 import { Size } from "../general";
 
 export enum LinkAction {
@@ -31,20 +31,22 @@ export const Link: React.FC<LinkProps> = ({
   };
   const colorClass = {
     [LinkAction.DEFAULT]: "p-0 text-primary-700 bg-white",
-    [LinkAction.GRAY]:
-      "p-0 text-gray-500 bg-white",
+    [LinkAction.GRAY]: "p-0 text-gray-500 bg-white",
   };
   return (
-    <NextLink
-      href={href}
-      passHref
-    >
+    <NextLink href={href} passHref>
       <a
-        className={classNames("w-full rounded-lg font-medium", sizeClass[size], colorClass[action], {
-          "cursor-not-allowed text-gray-300 pointer-events-none": disabled,
-        })}>
+        className={classNames(
+          "w-full rounded-lg font-medium",
+          sizeClass[size],
+          colorClass[action],
+          {
+            "cursor-not-allowed text-gray-300 pointer-events-none": disabled,
+          }
+        )}
+      >
         {children}
       </a>
     </NextLink>
   );
-}
+};

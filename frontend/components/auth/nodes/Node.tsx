@@ -19,10 +19,7 @@ interface Props {
   disabled: boolean;
 }
 
-export const Node = ({
-  node,
-  disabled,
-}: Props) => {
+export const Node = ({ node, disabled }: Props) => {
   if (isUiNodeImageAttributes(node.attributes)) {
     return <NodeImage node={node} attributes={node.attributes} />;
   }
@@ -41,11 +38,7 @@ export const Node = ({
 
   if (isUiNodeInputAttributes(node.attributes)) {
     return (
-      <NodeInput
-        node={node}
-        disabled={disabled}
-        attributes={node.attributes}
-      />
+      <NodeInput node={node} disabled={disabled} attributes={node.attributes} />
     );
   }
 

@@ -4,7 +4,6 @@ export type ValueSetter = (
   value: string | number | boolean | undefined
 ) => void;
 
-
 export interface NodeInputProps {
   node: UiNode;
   attributes: UiNodeInputAttributes;

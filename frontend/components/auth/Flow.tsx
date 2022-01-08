@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 import { getNodeId } from "@ory/integrations/ui";
 import { useForm, FormProvider } from "react-hook-form";
 import {
@@ -38,11 +38,11 @@ export type Methods =
 export type Props = {
   // The flow
   flow?:
-  | SelfServiceLoginFlow
-  | SelfServiceRegistrationFlow
-  | SelfServiceSettingsFlow
-  | SelfServiceVerificationFlow
-  | SelfServiceRecoveryFlow;
+    | SelfServiceLoginFlow
+    | SelfServiceRegistrationFlow
+    | SelfServiceSettingsFlow
+    | SelfServiceVerificationFlow
+    | SelfServiceRecoveryFlow;
   // Only show certain nodes. We will always render the default nodes for CSRF tokens.
   only?: Methods;
   // Is triggered on submission
@@ -51,12 +51,7 @@ export type Props = {
   hideGlobalMessages?: boolean;
 };
 
-export const Flow = ({
-  flow,
-  only,
-  onSubmit,
-  hideGlobalMessages,
-}: Props) => {
+export const Flow = ({ flow, only, onSubmit, hideGlobalMessages }: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const methods = useForm<Values>();
 
@@ -99,26 +94,20 @@ export const Flow = ({
   }
 
   return (
-    <FormProvider {...methods} >
+    <FormProvider {...methods}>
       <form
         key={flow.id}
         action={flow.ui.action}
         method={flow.ui.method}
         onSubmit={methods.handleSubmit(handleSubmit)}
-        className='grid grid-cols-1 gap-5'
+        className="grid grid-cols-1 gap-5"
       >
         {!hideGlobalMessages ? <Messages messages={flow.ui.messages} /> : null}
         {nodes.map((node, k) => {
           const id = getNodeId(node) as keyof Values;
-          return (
-            <Node
-              key={`${id}-${k}`}
-              disabled={isLoading}
-              node={node}
-            />
-          );
+          return <Node key={`${id}-${k}`} disabled={isLoading} node={node} />;
         })}
       </form>
     </FormProvider>
   );
-}
+};
