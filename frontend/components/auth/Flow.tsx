@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { getNodeId } from "@ory/integrations/ui";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
 import {
   SelfServiceLoginFlow,
   SelfServiceRecoveryFlow,
@@ -35,7 +35,7 @@ export type Methods =
   | "link"
   | "lookup_secret";
 
-export type Props = {
+export type Props<T> = {
   // The flow
   flow?:
     | SelfServiceLoginFlow
@@ -46,14 +46,19 @@ export type Props = {
   // Only show certain nodes. We will always render the default nodes for CSRF tokens.
   only?: Methods;
   // Is triggered on submission
-  onSubmit: (values: Values) => Promise<void>;
+  onSubmit: (values: T) => Promise<void>;
   // Do not show the global messages. Useful when rendering them elsewhere.
   hideGlobalMessages?: boolean;
 };
 
-export const Flow = ({ flow, only, onSubmit, hideGlobalMessages }: Props) => {
+export const Flow = <T,>({
+  flow,
+  only,
+  onSubmit,
+  hideGlobalMessages,
+}: Props<T>) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const methods = useForm<Values>();
+  const methods = useForm<T>();
 
   const filterNodes = useCallback((): Array<UiNode> => {
     if (!flow) {
@@ -67,7 +72,7 @@ export const Flow = ({ flow, only, onSubmit, hideGlobalMessages }: Props) => {
     });
   }, [flow, only]);
 
-  const handleSubmit = (data: Values) => {
+  const handleSubmit: SubmitHandler<T> = (data) => {
     // Prevent double submission!
     if (isLoading) {
       return Promise.resolve();
@@ -75,7 +80,7 @@ export const Flow = ({ flow, only, onSubmit, hideGlobalMessages }: Props) => {
 
     setIsLoading(true);
 
-    return onSubmit(data).finally(() => {
+    return onSubmit(data as T).finally(() => {
       // We wait for reconciliation and update the state after 50ms
       // Done submitting - update loading status
       setIsLoading(false);

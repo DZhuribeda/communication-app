@@ -95,7 +95,10 @@ const Registration: NextPage = () => {
       <div className="container mx-auto w-96 grid place-items-center h-screen">
         <div className="w-96">
           <h1 className="text-displaySm text-center pb-8">Create account</h1>
-          <Flow onSubmit={onSubmit} flow={flow} />
+          <Flow<SubmitSelfServiceRegistrationFlowBody>
+            onSubmit={onSubmit}
+            flow={flow}
+          />
           <div className="pt-8 text-center">
             <span className="text-gray-500 text-sm">
               Already have an account?
