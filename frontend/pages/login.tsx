@@ -5,13 +5,13 @@ import {
 import { AxiosError } from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import { Flow } from "../components/auth/Flow";
+import { Size } from "../components/core/general";
+import { Link } from "../components/core/link/link";
 import { handleGetFlowError, handleFlowError } from "../libs/auth/error";
-import { useLogoutHandler } from "../libs/auth/hook";
 import { kratos } from "../libs/auth/kratos";
 
 const Login: NextPage = () => {
@@ -32,7 +32,7 @@ const Login: NextPage = () => {
 
   // This might be confusing, but we want to show the user an option
   // to sign out if they are performing two-factor authentication!
-  const onLogout = useLogoutHandler([aal, refresh]);
+  // const onLogout = useLogoutHandler([aal, refresh]);
 
   useEffect(() => {
     // If the router is not ready yet, or we already have a flow, do nothing.
@@ -99,39 +99,27 @@ const Login: NextPage = () => {
       <Head>
         <title>Sign in</title>
       </Head>
-      <div>
-        <h1>
-          {(() => {
-            if (flow?.refresh) {
-              return "Confirm Action";
-            } else if (flow?.requested_aal === "aal2") {
-              return "Two-Factor Authentication";
-            }
-            return "Sign In";
-          })()}
-        </h1>
-        <Flow onSubmit={onSubmit} flow={flow} />
-      </div>
-      {aal || refresh ? (
-        <div>
-          <a data-testid="logout-link" onClick={onLogout}>
-            Log out
-          </a>
+      <div className="container mx-auto w-96 grid place-items-center h-screen">
+        <div className="w-96">
+          <h1 className="text-displaySm text-center pb-8">
+            Sign in to your account
+          </h1>
+          <Flow onSubmit={onSubmit} flow={flow} />
+          <div className="pt-6 text-right">
+            <Link href="/recovery" size={Size.md}>
+              Forgot password?
+            </Link>
+          </div>
+          <div className="pt-8 text-center">
+            <span className="text-gray-500 text-sm">
+              Don’t have an account?{" "}
+            </span>
+            <Link href="/login" size={Size.md}>
+              Sign up
+            </Link>
+          </div>
         </div>
-      ) : (
-        <>
-          <div>
-            <Link href="/registration" passHref>
-              Create account
-            </Link>
-          </div>
-          <div>
-            <Link href="/recovery" passHref>
-              Recover your account
-            </Link>
-          </div>
-        </>
-      )}
+      </div>
     </>
   );
 };

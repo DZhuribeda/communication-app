@@ -23,15 +23,15 @@ export const Link: React.FC<LinkProps> = ({
   disabled = false,
 }) => {
   const sizeClass = {
-    [Size.sm]: "py-2 px-3 text-sm",
-    [Size.md]: "py-3 px-4 text-sm",
-    [Size.lg]: "py-3 px-4 text-md",
-    [Size.xl]: "py-4 px-5 text-md",
-    [Size.xxl]: "py-5 px-6 text-md",
+    [Size.sm]: "text-sm",
+    [Size.md]: "text-sm",
+    [Size.lg]: "text-md",
+    [Size.xl]: "text-md",
+    [Size.xxl]: "text-md",
   };
   const colorClass = {
-    [LinkAction.DEFAULT]: "p-0 text-primary-700 bg-white",
-    [LinkAction.GRAY]: "p-0 text-gray-500 bg-white",
+    [LinkAction.DEFAULT]: "p-0 text-primary-700",
+    [LinkAction.GRAY]: "p-0 text-gray-500",
   };
   return (
     <NextLink href={href} passHref>
