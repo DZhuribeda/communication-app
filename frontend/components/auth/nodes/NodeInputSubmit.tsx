@@ -15,7 +15,8 @@ export function NodeInputSubmit<T>({
         name={attributes.name}
         onClick={(e) => {
           // On click, we set this value, and once set, dispatch the submission!
-          setValue(attributes.value).then(() => dispatchSubmit(e));
+          setValue(attributes.value)
+          dispatchSubmit(e);
         }}
         value={attributes.value || ""}
         disabled={attributes.disabled || disabled}

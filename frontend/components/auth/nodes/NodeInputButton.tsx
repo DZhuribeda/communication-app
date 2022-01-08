@@ -27,7 +27,8 @@ export function NodeInputButton<T>({
         name={attributes.name}
         onClick={(e) => {
           onClick();
-          setValue(attributes.value).then(() => dispatchSubmit(e));
+          setValue(attributes.value)
+          dispatchSubmit(e);
         }}
         value={attributes.value || ""}
         disabled={attributes.disabled || disabled}

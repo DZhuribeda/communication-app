@@ -1,3 +1,4 @@
+import { useState, useEffect, useCallback, FormEvent } from 'react';
 import { getNodeId } from "@ory/integrations/ui";
 import { isUiNodeInputAttributes } from "@ory/integrations/ui";
 import {
@@ -13,7 +14,6 @@ import {
   SubmitSelfServiceVerificationFlowBody,
   UiNode,
 } from "@ory/kratos-client";
-import { Component, FormEvent } from "react";
 
 import { Messages } from "./Messages";
 import { Node } from "./nodes/Node";
@@ -38,11 +38,11 @@ export type Methods =
 export type Props<T> = {
   // The flow
   flow?:
-    | SelfServiceLoginFlow
-    | SelfServiceRegistrationFlow
-    | SelfServiceSettingsFlow
-    | SelfServiceVerificationFlow
-    | SelfServiceRecoveryFlow;
+  | SelfServiceLoginFlow
+  | SelfServiceRegistrationFlow
+  | SelfServiceSettingsFlow
+  | SelfServiceVerificationFlow
+  | SelfServiceRecoveryFlow;
   // Only show certain nodes. We will always render the default nodes for CSRF tokens.
   only?: Methods;
   // Is triggered on submission
@@ -60,27 +60,16 @@ type State<T> = {
   isLoading: boolean;
 };
 
-export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
-  constructor(props: Props<T>) {
-    super(props);
-    this.state = {
-      values: emptyState(),
-      isLoading: false,
-    };
-  }
+export const Flow = <T extends Values>({
+  flow,
+  only,
+  onSubmit,
+  hideGlobalMessages,
+}: Props<T>) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [values, setValues] = useState<T>(() => emptyState());
 
-  componentDidMount() {
-    this.initializeValues(this.filterNodes());
-  }
-
-  componentDidUpdate(prevProps: Props<T>) {
-    if (prevProps.flow !== this.props.flow) {
-      // Flow has changed, reload the values!
-      this.initializeValues(this.filterNodes());
-    }
-  }
-
-  initializeValues = (nodes: Array<UiNode> = []) => {
+  const initializeValues = useCallback((nodes: Array<UiNode> = []) => {
     // Compute the values
     const values = emptyState<T>();
     nodes.forEach((node) => {
@@ -100,11 +89,9 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
     });
 
     // Set all the values!
-    this.setState((state) => ({ ...state, values }));
-  };
-
-  filterNodes = (): Array<UiNode> => {
-    const { flow, only } = this.props;
+    setValues(values);
+  }, []);
+  const filterNodes = useCallback((): Array<UiNode> => {
     if (!flow) {
       return [];
     }
@@ -114,83 +101,68 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
       }
       return group === "default" || group === only;
     });
-  };
+  }, [flow, only]);
+  useEffect(() => {
+    initializeValues(filterNodes());
+  }, [flow, initializeValues, filterNodes]);
 
-  // Handles form submission
-  handleSubmit = (e: MouseEvent | FormEvent) => {
+  const handleSubmit = (e: MouseEvent | FormEvent) => {
     // Prevent all native handlers
     e.stopPropagation();
     e.preventDefault();
 
     // Prevent double submission!
-    if (this.state.isLoading) {
+    if (isLoading) {
       return Promise.resolve();
     }
 
-    this.setState((state) => ({
-      ...state,
-      isLoading: true,
-    }));
+    setIsLoading(true);
 
-    return this.props.onSubmit(this.state.values).finally(() => {
+    return onSubmit(values).finally(() => {
       // We wait for reconciliation and update the state after 50ms
       // Done submitting - update loading status
-      this.setState((state) => ({
-        ...state,
-        isLoading: false,
-      }));
+      setIsLoading(false);
     });
   };
 
-  render() {
-    const { hideGlobalMessages, flow } = this.props;
-    const { values, isLoading } = this.state;
+  // Filter the nodes - only show the ones we want
+  const nodes = filterNodes();
 
-    // Filter the nodes - only show the ones we want
-    const nodes = this.filterNodes();
-
-    if (!flow) {
-      // No flow was set yet? It's probably still loading...
-      //
-      // Nodes have only one element? It is probably just the CSRF Token
-      // and the filter did not match any elements!
-      return null;
-    }
-
-    return (
-      <form
-        action={flow.ui.action}
-        method={flow.ui.method}
-        onSubmit={this.handleSubmit}
-      >
-        {!hideGlobalMessages ? <Messages messages={flow.ui.messages} /> : null}
-        {nodes.map((node, k) => {
-          const id = getNodeId(node) as keyof Values;
-          return (
-            <Node
-              key={`${id}-${k}`}
-              disabled={isLoading}
-              node={node}
-              value={values[id]}
-              dispatchSubmit={this.handleSubmit}
-              setValue={(value) =>
-                new Promise((resolve) => {
-                  this.setState(
-                    (state) => ({
-                      ...state,
-                      values: {
-                        ...state.values,
-                        [getNodeId(node)]: value,
-                      },
-                    }),
-                    resolve
-                  );
-                })
-              }
-            />
-          );
-        })}
-      </form>
-    );
+  if (!flow) {
+    // No flow was set yet? It's probably still loading...
+    //
+    // Nodes have only one element? It is probably just the CSRF Token
+    // and the filter did not match any elements!
+    return null;
   }
+
+  return (
+    <form
+      action={flow.ui.action}
+      method={flow.ui.method}
+      onSubmit={handleSubmit}
+    >
+      {!hideGlobalMessages ? <Messages messages={flow.ui.messages} /> : null}
+      {nodes.map((node, k) => {
+        const id = getNodeId(node) as keyof Values;
+        return (
+          <Node
+            key={`${id}-${k}`}
+            disabled={isLoading}
+            node={node}
+            value={values[id]}
+            dispatchSubmit={handleSubmit}
+            setValue={(value) =>
+              setValues(
+                (state) => ({
+                  ...state,
+                  [getNodeId(node)]: value,
+                }),
+              )
+            }
+          />
+        );
+      })}
+    </form>
+  );
 }
