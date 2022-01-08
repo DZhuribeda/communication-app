@@ -4,6 +4,6 @@ describe('basic', () => {
   })
 
   it('intro', () => {
-    cy.findByText('Hello world!').should('exist')
+    cy.findByRole('heading', {name: 'Rooms'}).should('exist')
   })
 })
