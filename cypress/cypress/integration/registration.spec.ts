@@ -9,8 +9,8 @@ describe('Registration', () => {
     cy.findByRole('heading').should('have.text', 'Create account')
     cy.findByLabelText(/E-Mail/i).should('exist');
     cy.findByLabelText(/Password/i).should('exist');
-    cy.findByLabelText(/First Name/i).should('exist');
-    cy.findByLabelText(/Last Name/i).should('exist');
+    // cy.findByLabelText(/First Name/i).should('exist');
+    // cy.findByLabelText(/Last Name/i).should('exist');
     cy.findByRole('button', { name: /Sign Up/i }).should('exist');
     cy.findByText(/Log in/i).should('exist');
   });
