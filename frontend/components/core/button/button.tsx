@@ -1,3 +1,4 @@
+import React from 'react';
 import classNames from "classnames";
 import { Size } from "../general";
 
@@ -13,18 +14,23 @@ export enum ButtonAction {
 
 type ButtonProps = {
   size: Size;
+  name: string;
+  value?: string;
   type?: "button" | "submit" | "reset";
   action?: ButtonAction;
   disabled?: boolean;
 };
 
-export const Button: React.FC<ButtonProps> = ({
+// eslint-disable-next-line react/display-name
+export const Button = React.forwardRef<HTMLButtonElement, React.PropsWithChildren<ButtonProps>>(({
   children,
   size,
+  name,
+  value,
   action = ButtonAction.PRIMARY,
   type = "button",
   disabled = false,
-}) => {
+}, ref) => {
   const sizeClass = {
     [Size.sm]: "py-2 px-3 text-sm",
     [Size.md]: "py-3 px-4 text-sm",
@@ -49,11 +55,14 @@ export const Button: React.FC<ButtonProps> = ({
   };
   return (
     <button
+      ref={ref}
+      name={name}
+      value={value}
       type={type}
       disabled={disabled}
-      className={classNames("rounded-lg", sizeClass[size], colorClass[action])}
+      className={classNames("w-full rounded-lg font-medium", sizeClass[size], colorClass[action])}
     >
       {children}
     </button>
   );
-};
+});

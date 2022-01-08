@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, FormEvent } from 'react';
+import { useState, useCallback } from 'react';
 import { getNodeId } from "@ory/integrations/ui";
-import { isUiNodeInputAttributes } from "@ory/integrations/ui";
+import { useForm, FormProvider } from "react-hook-form";
 import {
   SelfServiceLoginFlow,
   SelfServiceRecoveryFlow,
@@ -35,7 +35,7 @@ export type Methods =
   | "link"
   | "lookup_secret";
 
-export type Props<T> = {
+export type Props = {
   // The flow
   flow?:
   | SelfServiceLoginFlow
@@ -46,51 +46,22 @@ export type Props<T> = {
   // Only show certain nodes. We will always render the default nodes for CSRF tokens.
   only?: Methods;
   // Is triggered on submission
-  onSubmit: (values: T) => Promise<void>;
+  onSubmit: (values: Values) => Promise<void>;
   // Do not show the global messages. Useful when rendering them elsewhere.
   hideGlobalMessages?: boolean;
 };
 
-function emptyState<T>() {
-  return {} as T;
-}
-
-type State<T> = {
-  values: T;
-  isLoading: boolean;
-};
-
-export const Flow = <T extends Values>({
+export const Flow = ({
   flow,
   only,
   onSubmit,
   hideGlobalMessages,
-}: Props<T>) => {
+}: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [values, setValues] = useState<T>(() => emptyState());
+  const methods = useForm<Values>();
+  console.log(methods.formState.isSubmitting);
+  console.log(methods.formState.errors);
 
-  const initializeValues = useCallback((nodes: Array<UiNode> = []) => {
-    // Compute the values
-    const values = emptyState<T>();
-    nodes.forEach((node) => {
-      // This only makes sense for text nodes
-      if (isUiNodeInputAttributes(node.attributes)) {
-        if (
-          node.attributes.type === "button" ||
-          node.attributes.type === "submit"
-        ) {
-          // In order to mimic real HTML forms, we need to skip setting the value
-          // for buttons as the button value will (in normal HTML forms) only trigger
-          // if the user clicks it.
-          return;
-        }
-        values[node.attributes.name as keyof Values] = node.attributes.value;
-      }
-    });
-
-    // Set all the values!
-    setValues(values);
-  }, []);
   const filterNodes = useCallback((): Array<UiNode> => {
     if (!flow) {
       return [];
@@ -102,15 +73,8 @@ export const Flow = <T extends Values>({
       return group === "default" || group === only;
     });
   }, [flow, only]);
-  useEffect(() => {
-    initializeValues(filterNodes());
-  }, [flow, initializeValues, filterNodes]);
 
-  const handleSubmit = (e: MouseEvent | FormEvent) => {
-    // Prevent all native handlers
-    e.stopPropagation();
-    e.preventDefault();
-
+  const handleSubmit = (data: Values) => {
     // Prevent double submission!
     if (isLoading) {
       return Promise.resolve();
@@ -118,7 +82,7 @@ export const Flow = <T extends Values>({
 
     setIsLoading(true);
 
-    return onSubmit(values).finally(() => {
+    return onSubmit(data).finally(() => {
       // We wait for reconciliation and update the state after 50ms
       // Done submitting - update loading status
       setIsLoading(false);
@@ -137,32 +101,26 @@ export const Flow = <T extends Values>({
   }
 
   return (
-    <form
-      action={flow.ui.action}
-      method={flow.ui.method}
-      onSubmit={handleSubmit}
-    >
-      {!hideGlobalMessages ? <Messages messages={flow.ui.messages} /> : null}
-      {nodes.map((node, k) => {
-        const id = getNodeId(node) as keyof Values;
-        return (
-          <Node
-            key={`${id}-${k}`}
-            disabled={isLoading}
-            node={node}
-            value={values[id]}
-            dispatchSubmit={handleSubmit}
-            setValue={(value) =>
-              setValues(
-                (state) => ({
-                  ...state,
-                  [getNodeId(node)]: value,
-                }),
-              )
-            }
-          />
-        );
-      })}
-    </form>
+    <FormProvider {...methods} >
+      <form
+        key={flow.id}
+        action={flow.ui.action}
+        method={flow.ui.method}
+        onSubmit={methods.handleSubmit(handleSubmit)}
+        className='grid grid-cols-1 gap-5'
+      >
+        {!hideGlobalMessages ? <Messages messages={flow.ui.messages} /> : null}
+        {nodes.map((node, k) => {
+          const id = getNodeId(node) as keyof Values;
+          return (
+            <Node
+              key={`${id}-${k}`}
+              disabled={isLoading}
+              node={node}
+            />
+          );
+        })}
+      </form>
+    </FormProvider>
   );
 }

@@ -12,22 +12,16 @@ import { NodeImage } from "./NodeImage";
 import { NodeInput } from "./NodeInput";
 import { NodeScript } from "./NodeScript";
 import { NodeText } from "./NodeText";
-import { FormDispatcher, ValueSetter } from "./helpers";
+import { ValueSetter } from "./helpers";
 
 interface Props {
   node: UiNode;
   disabled: boolean;
-  value: any;
-  setValue: ValueSetter;
-  dispatchSubmit: FormDispatcher;
 }
 
 export const Node = ({
   node,
-  value,
-  setValue,
   disabled,
-  dispatchSubmit,
 }: Props) => {
   if (isUiNodeImageAttributes(node.attributes)) {
     return <NodeImage node={node} attributes={node.attributes} />;
@@ -48,9 +42,6 @@ export const Node = ({
   if (isUiNodeInputAttributes(node.attributes)) {
     return (
       <NodeInput
-        dispatchSubmit={dispatchSubmit}
-        value={value}
-        setValue={setValue}
         node={node}
         disabled={disabled}
         attributes={node.attributes}
