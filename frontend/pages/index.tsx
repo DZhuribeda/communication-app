@@ -1,27 +1,15 @@
 import type { NextPage } from "next";
-import { useEffect } from "react";
-import { Peers } from "../components/media/Peers";
-import { useStore } from "../libs/store/useStore";
-import { SelfView } from "./../components/media/SelfView";
+import { Layout } from "../components/layout/layout";
 
 const Home: NextPage = () => {
-  // const joinToRoom = useStore((state) => state.joinToRoom);
-  // useEffect(() => {
-  //   joinToRoom();
-  // }, []);
-
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
-      <div>
-        You
-        <SelfView />
+    <Layout title="Rooms">
+      {/* Replace with your content */}
+      <div className="px-4 py-6 sm:px-0">
+        <div className="border-4 border-dashed border-gray-200 rounded-lg h-96" />
       </div>
-      <div>
-        Peers
-        <Peers />
-      </div>
-    </div>
+      {/* /End replace */}
+    </Layout>
   );
 };
 
