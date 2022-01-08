@@ -59,8 +59,6 @@ export const Flow = ({
 }: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const methods = useForm<Values>();
-  console.log(methods.formState.isSubmitting);
-  console.log(methods.formState.errors);
 
   const filterNodes = useCallback((): Array<UiNode> => {
     if (!flow) {

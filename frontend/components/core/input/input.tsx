@@ -52,7 +52,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
         onBlur={onBlur}
       />
       {error ? (
-        <span className="pt-1 text-error-500 text-sm">{error}</span>
+        <span role="alert" className="pt-1 text-error-500 text-sm">{error}</span>
       ) : null}
       {helperText && !error ? (
         <span className="pt-1 text-gray-500 text-sm">{helperText}</span>
