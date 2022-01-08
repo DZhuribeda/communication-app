@@ -1,27 +1,37 @@
 import { getNodeLabel } from "@ory/integrations/ui";
+import { useFormContext } from "react-hook-form";
+import { Button } from "../../core/button/button";
+import { Size } from "../../core/general";
 import { NodeInputProps } from "./helpers";
 
 export function NodeInputSubmit<T>({
   node,
   attributes,
-  setValue,
   disabled,
-  dispatchSubmit,
 }: NodeInputProps) {
+  const { register } = useFormContext(); // retrieve all hook methods
+
   return (
-    <>
-      <button
-        className="p-2 px-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300"
-        name={attributes.name}
-        onClick={(e) => {
-          // On click, we set this value, and once set, dispatch the submission!
-          setValue(attributes.value).then(() => dispatchSubmit(e));
-        }}
-        value={attributes.value || ""}
-        disabled={attributes.disabled || disabled}
-      >
-        {getNodeLabel(node)}
-      </button>
-    </>
+    <Button
+      {...register(attributes.name, {
+        required: attributes.required,
+      })}
+      type="submit"
+      size={Size.md}
+      value={attributes.value || ""}
+      disabled={attributes.disabled || disabled}
+    >
+      {getNodeLabel(node)}
+    </Button>
+    // <>
+    //   <button
+    //     className="p-2 px-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300"
+    //     name={attributes.name}
+    //     value={attributes.value || ""}
+    //     disabled={attributes.disabled || disabled}
+    //   >
+    //     {getNodeLabel(node)}
+    //   </button>
+    // </>
   );
 }

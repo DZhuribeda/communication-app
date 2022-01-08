@@ -5,7 +5,6 @@ import { NodeInputProps } from "./helpers";
 export function NodeInputCheckbox<T>({
   node,
   attributes,
-  setValue,
   disabled,
 }: NodeInputProps) {
   // Render a checkbox.s
@@ -23,7 +22,6 @@ export function NodeInputCheckbox<T>({
         aria-describedby="checkbox-1"
         type="checkbox"
         className="bg-gray-50 border-gray-300 focus:ring-3 focus:ring-blue-300 h-4 w-4 rounded"
-        onChange={(e) => setValue(e.target.checked)}
         defaultChecked={attributes.value === true}
         disabled={attributes.disabled || disabled}
       />

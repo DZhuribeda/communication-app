@@ -1,5 +1,6 @@
+import { useState, useCallback } from "react";
 import { getNodeId } from "@ory/integrations/ui";
-import { isUiNodeInputAttributes } from "@ory/integrations/ui";
+import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
 import {
   SelfServiceLoginFlow,
   SelfServiceRecoveryFlow,
@@ -13,7 +14,6 @@ import {
   SubmitSelfServiceVerificationFlowBody,
   UiNode,
 } from "@ory/kratos-client";
-import { Component, FormEvent } from "react";
 
 import { Messages } from "./Messages";
 import { Node } from "./nodes/Node";
@@ -51,60 +51,16 @@ export type Props<T> = {
   hideGlobalMessages?: boolean;
 };
 
-function emptyState<T>() {
-  return {} as T;
-}
+export const Flow = <T,>({
+  flow,
+  only,
+  onSubmit,
+  hideGlobalMessages,
+}: Props<T>) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const methods = useForm<T>();
 
-type State<T> = {
-  values: T;
-  isLoading: boolean;
-};
-
-export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
-  constructor(props: Props<T>) {
-    super(props);
-    this.state = {
-      values: emptyState(),
-      isLoading: false,
-    };
-  }
-
-  componentDidMount() {
-    this.initializeValues(this.filterNodes());
-  }
-
-  componentDidUpdate(prevProps: Props<T>) {
-    if (prevProps.flow !== this.props.flow) {
-      // Flow has changed, reload the values!
-      this.initializeValues(this.filterNodes());
-    }
-  }
-
-  initializeValues = (nodes: Array<UiNode> = []) => {
-    // Compute the values
-    const values = emptyState<T>();
-    nodes.forEach((node) => {
-      // This only makes sense for text nodes
-      if (isUiNodeInputAttributes(node.attributes)) {
-        if (
-          node.attributes.type === "button" ||
-          node.attributes.type === "submit"
-        ) {
-          // In order to mimic real HTML forms, we need to skip setting the value
-          // for buttons as the button value will (in normal HTML forms) only trigger
-          // if the user clicks it.
-          return;
-        }
-        values[node.attributes.name as keyof Values] = node.attributes.value;
-      }
-    });
-
-    // Set all the values!
-    this.setState((state) => ({ ...state, values }));
-  };
-
-  filterNodes = (): Array<UiNode> => {
-    const { flow, only } = this.props;
+  const filterNodes = useCallback((): Array<UiNode> => {
     if (!flow) {
       return [];
     }
@@ -114,83 +70,49 @@ export class Flow<T extends Values> extends Component<Props<T>, State<T>> {
       }
       return group === "default" || group === only;
     });
-  };
+  }, [flow, only]);
 
-  // Handles form submission
-  handleSubmit = (e: MouseEvent | FormEvent) => {
-    // Prevent all native handlers
-    e.stopPropagation();
-    e.preventDefault();
-
+  const handleSubmit: SubmitHandler<T> = (data) => {
     // Prevent double submission!
-    if (this.state.isLoading) {
+    if (isLoading) {
       return Promise.resolve();
     }
 
-    this.setState((state) => ({
-      ...state,
-      isLoading: true,
-    }));
+    setIsLoading(true);
 
-    return this.props.onSubmit(this.state.values).finally(() => {
+    return onSubmit(data as T).finally(() => {
       // We wait for reconciliation and update the state after 50ms
       // Done submitting - update loading status
-      this.setState((state) => ({
-        ...state,
-        isLoading: false,
-      }));
+      setIsLoading(false);
     });
   };
 
-  render() {
-    const { hideGlobalMessages, flow } = this.props;
-    const { values, isLoading } = this.state;
+  // Filter the nodes - only show the ones we want
+  const nodes = filterNodes();
 
-    // Filter the nodes - only show the ones we want
-    const nodes = this.filterNodes();
+  if (!flow) {
+    // No flow was set yet? It's probably still loading...
+    //
+    // Nodes have only one element? It is probably just the CSRF Token
+    // and the filter did not match any elements!
+    return null;
+  }
 
-    if (!flow) {
-      // No flow was set yet? It's probably still loading...
-      //
-      // Nodes have only one element? It is probably just the CSRF Token
-      // and the filter did not match any elements!
-      return null;
-    }
-
-    return (
+  return (
+    <FormProvider {...methods}>
       <form
+        key={flow.id}
         action={flow.ui.action}
         method={flow.ui.method}
-        onSubmit={this.handleSubmit}
+        onSubmit={methods.handleSubmit(handleSubmit)}
+        className="grid grid-cols-1 gap-5"
       >
         {!hideGlobalMessages ? <Messages messages={flow.ui.messages} /> : null}
         {nodes.map((node, k) => {
           const id = getNodeId(node) as keyof Values;
-          return (
-            <Node
-              key={`${id}-${k}`}
-              disabled={isLoading}
-              node={node}
-              value={values[id]}
-              dispatchSubmit={this.handleSubmit}
-              setValue={(value) =>
-                new Promise((resolve) => {
-                  this.setState(
-                    (state) => ({
-                      ...state,
-                      values: {
-                        ...state.values,
-                        [getNodeId(node)]: value,
-                      },
-                    }),
-                    resolve
-                  );
-                })
-              }
-            />
-          );
+          return <Node key={`${id}-${k}`} disabled={isLoading} node={node} />;
         })}
       </form>
-    );
-  }
-}
+    </FormProvider>
+  );
+};

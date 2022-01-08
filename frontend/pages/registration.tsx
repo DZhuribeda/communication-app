@@ -2,7 +2,6 @@ import {
   SelfServiceRegistrationFlow,
   SubmitSelfServiceRegistrationFlowBody,
 } from "@ory/kratos-client";
-import Link from "next/link";
 import { AxiosError } from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -12,8 +11,10 @@ import { useEffect, useState } from "react";
 // Import render helpers
 import { Flow } from "../components/auth/Flow";
 import { handleFlowError } from "../libs/auth/error";
+import { Link } from "../components/core/link/link";
 // Import the SDK
 import { kratos } from "../libs/auth/kratos";
+import { Size } from "../components/core/general";
 
 // Renders the registration page
 const Registration: NextPage = () => {
@@ -91,14 +92,22 @@ const Registration: NextPage = () => {
       <Head>
         <title>Create account</title>
       </Head>
-      <div>
-        <h1>Create account</h1>
-        <Flow onSubmit={onSubmit} flow={flow} />
-      </div>
-      <div>
-        <Link data-testid="cta-link" href="/login">
-          Sign in
-        </Link>
+      <div className="container mx-auto w-96 grid place-items-center h-screen">
+        <div className="w-96">
+          <h1 className="text-displaySm text-center pb-8">Create account</h1>
+          <Flow<SubmitSelfServiceRegistrationFlowBody>
+            onSubmit={onSubmit}
+            flow={flow}
+          />
+          <div className="pt-8 text-center">
+            <span className="text-gray-500 text-sm">
+              Already have an account?
+            </span>
+            <Link href="/login" size={Size.md}>
+              Log in
+            </Link>
+          </div>
+        </div>
       </div>
     </>
   );

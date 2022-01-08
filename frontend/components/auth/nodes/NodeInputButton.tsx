@@ -5,9 +5,7 @@ import { NodeInputProps } from "./helpers";
 export function NodeInputButton<T>({
   node,
   attributes,
-  setValue,
   disabled,
-  dispatchSubmit,
 }: NodeInputProps) {
   // Some attributes have dynamic JavaScript - this is for example required for WebAuthn.
   const onClick = () => {
@@ -25,10 +23,7 @@ export function NodeInputButton<T>({
       <button
         className="p-2 px-5 bg-blue-500 text-gray-100 text-lg rounded-lg focus:border-4 border-blue-300"
         name={attributes.name}
-        onClick={(e) => {
-          onClick();
-          setValue(attributes.value).then(() => dispatchSubmit(e));
-        }}
+        onClick={onClick}
         value={attributes.value || ""}
         disabled={attributes.disabled || disabled}
       >
