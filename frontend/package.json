@@ -51,6 +51,7 @@
     "jest": "^27.4.5",
     "lint-staged": "^12.1.5",
     "msw": "^0.36.3",
+    "next-router-mock": "^0.6.5",
     "postcss": "^8.4.5",
     "prettier": "^2.5.1",
     "setimmediate": "^1.0.5",
