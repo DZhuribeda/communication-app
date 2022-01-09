@@ -72,7 +72,7 @@ const Registration: NextPage = () => {
             console.log("This is the user session: ", data, data.identity);
 
             // For now however we just want to redirect home!
-            return router.push(flow?.return_to || "/").then(() => {});
+            router.push(flow?.return_to || "/");
           })
           .catch(handleFlowError(router, "registration", setFlow))
           .catch((err: AxiosError) => {
@@ -101,7 +101,7 @@ const Registration: NextPage = () => {
           />
           <div className="pt-8 text-center">
             <span className="text-gray-500 text-sm">
-              Already have an account?
+              Already have an account?{" "}
             </span>
             <Link href="/login" size={Size.md}>
               Log in

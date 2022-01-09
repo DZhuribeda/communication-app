@@ -36,21 +36,21 @@ selfservice:
 
     verification:
       enabled: true
-      ui_url: http://127.0.0.1:3000/verify
+      ui_url: http://127.0.0.1:3000/verification
       after:
         default_browser_return_url: http://127.0.0.1:3000/
 
     logout:
       after:
-        default_browser_return_url: http://127.0.0.1:3000/auth/login
+        default_browser_return_url: http://127.0.0.1:3000/login
 
     login:
-      ui_url: http://127.0.0.1:3000/auth/login
+      ui_url: http://127.0.0.1:3000/login
       lifespan: 10m
 
     registration:
       lifespan: 10m
-      ui_url: http://127.0.0.1:3000/auth/registration
+      ui_url: http://127.0.0.1:3000/registration
       after:
         password:
           hooks:

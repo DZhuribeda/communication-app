@@ -80,7 +80,6 @@ const Login: NextPage = () => {
             }
             router.push("/");
           })
-          .then(() => {})
           .catch(handleFlowError(router, "login", setFlow))
           .catch((err: AxiosError) => {
             // If the previous handler did not catch the error it's most likely a form validation error
@@ -114,7 +113,7 @@ const Login: NextPage = () => {
             <span className="text-gray-500 text-sm">
               Don’t have an account?{" "}
             </span>
-            <Link href="/login" size={Size.md}>
+            <Link href="/registration" size={Size.md}>
               Sign up
             </Link>
           </div>

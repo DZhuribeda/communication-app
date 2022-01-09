@@ -5,3 +5,9 @@ export const kratos = new V0alpha2Api(
     basePath: `/api/.ory`,
   })
 );
+
+export const kratosServer = new V0alpha2Api(
+  new Configuration({
+    basePath: process.env.ORY_KRATOS_URL,
+  })
+);
