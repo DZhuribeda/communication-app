@@ -9,6 +9,10 @@ describe('Login', () => {
   });
   beforeEach(() => {
     cy.visit('/login');
+    cy.intercept({
+      method: 'POST',
+      url: '/api/.ory/self-service/login**',
+    }).as('login');
   });
 
   it('form shown', () => {
@@ -34,6 +38,7 @@ describe('Login', () => {
     cy.findByLabelText(/ID/i).type(email);
     cy.findByLabelText(/Password/i).type(password);
     cy.findByRole('button', { name: /Sign In/i }).click();
+    cy.wait('@login').its('response.statusCode').should('equal', 200);
     cy.location().should((loc) => {
       expect(loc.pathname).to.eq('/');
     });
