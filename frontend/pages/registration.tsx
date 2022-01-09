@@ -101,7 +101,7 @@ const Registration: NextPage = () => {
           />
           <div className="pt-8 text-center">
             <span className="text-gray-500 text-sm">
-              Already have an account?
+              Already have an account?{" "}
             </span>
             <Link href="/login" size={Size.md}>
               Log in

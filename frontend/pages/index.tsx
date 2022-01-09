@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import { Layout } from "../components/layout/layout";
+import { withAuthorizedUser } from "../libs/user";
 
 const Home: NextPage = () => {
   return (
@@ -14,3 +15,5 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+export const getServerSideProps = withAuthorizedUser();

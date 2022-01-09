@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Disclosure } from "@headlessui/react";
 import { useRouter } from "next/router";
 import { LogoutIcon, CogIcon, MenuIcon, XIcon } from "@heroicons/react/outline";
+import { useLogout } from "../../libs/user";
 
 const navigation = [{ name: "Rooms", href: "/", current: true }];
 const userNavigation = [
@@ -12,6 +13,7 @@ const userNavigation = [
 
 export function Navigation() {
   const { asPath } = useRouter();
+  const logoutUrl = useLogout();
   return (
     <Disclosure as="nav" className="bg-gray-900">
       {({ open }) => (
@@ -49,13 +51,12 @@ export function Navigation() {
                       <CogIcon className="h-6 w-6" aria-hidden="true" />
                     </a>
                   </Link>
-                  <button
-                    type="button"
-                    className="bg-gray-800 p-1 ml-3 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
-                  >
-                    <span className="sr-only">Logout</span>
-                    <LogoutIcon className="h-6 w-6" aria-hidden="true" />
-                  </button>
+                  <Link href={logoutUrl} passHref>
+                    <a className="bg-gray-800 p-1 ml-3 rounded-full text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+                      <span className="sr-only">Logout</span>
+                      <LogoutIcon className="h-6 w-6" aria-hidden="true" />
+                    </a>
+                  </Link>
                 </div>
               </div>
               <div className="-mr-2 flex tablet:hidden">
