@@ -1,19 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { RoomsController } from './rooms.controller';
 import { RoomsRepository } from './rooms.repository';
 import { RoomsService } from './rooms.service';
 
-describe('RoomsService', () => {
-  let service: RoomsService;
+describe('RoomsController', () => {
+  let controller: RoomsController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [RoomsController],
       providers: [RoomsService, RoomsRepository],
     }).compile();
 
-    service = module.get<RoomsService>(RoomsService);
+    controller = module.get<RoomsController>(RoomsController);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(controller).toBeDefined();
   });
 });
