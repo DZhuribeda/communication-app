@@ -2,8 +2,14 @@ import * as request from 'supertest';
 import { Test } from '@nestjs/testing';
 import { Worker } from 'mediasoup/node/lib/Worker';
 import { AppModule } from '../src/app.module';
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
+import {
+  ExecutionContext,
+  HttpStatus,
+  INestApplication,
+  ValidationPipe,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../src/auth/jwt-auth.guard';
+import { JwtStrategy } from '../src/auth/jwt.strategy';
 
 describe('RoomsController (e2e) unauthorized', () => {
   let app: INestApplication;
@@ -31,8 +37,12 @@ describe('RoomsController (e2e)', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
-    class MockJwtStrategy {
-      canActivate() {
+    class MockJwtAuthGuard {
+      canActivate(context: ExecutionContext): boolean {
+        const request = context.switchToHttp().getRequest();
+        request.user = {
+          id: '1',
+        };
         return true;
       }
     }
@@ -42,7 +52,7 @@ describe('RoomsController (e2e)', () => {
       .overrideProvider(Worker)
       .useClass(jest.fn())
       .overrideGuard(JwtAuthGuard)
-      .useClass(MockJwtStrategy)
+      .useClass(MockJwtAuthGuard)
       .compile();
 
     app = moduleFixture.createNestApplication();
