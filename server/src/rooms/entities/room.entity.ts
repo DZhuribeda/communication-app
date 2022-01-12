@@ -5,6 +5,10 @@ export class Room {
   slug: string;
 }
 
+export class RoomWithUserRole extends Room {
+  userRole: RoomRoles;
+}
+
 export class RoomMember {
   roomId: number;
   userId: string;
