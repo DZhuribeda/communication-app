@@ -4,13 +4,13 @@ export enum RoomActions {
   create = 'create',
   read = 'read',
   update = 'update',
-  delete = 'delete',
+  remove = 'remove',
 }
 
 export function getRoleActions(role: RoomRoles): RoomActions[] {
   switch (role) {
     case RoomRoles.owner:
-      return [RoomActions.read, RoomActions.update, RoomActions.delete];
+      return [RoomActions.read, RoomActions.update, RoomActions.remove];
     case RoomRoles.member:
       return [RoomActions.read];
     default:

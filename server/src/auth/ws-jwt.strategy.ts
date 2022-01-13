@@ -56,6 +56,7 @@ export class WsJwtStrategy extends PassportStrategy(Strategy, 'ws-jwt') {
   validate(payload: Payload) {
     return {
       id: payload.session.identity.id,
+      roles: [],
     };
   }
 }

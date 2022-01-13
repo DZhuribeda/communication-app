@@ -9,7 +9,6 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../src/auth/jwt-auth.guard';
-import { JwtStrategy } from '../src/auth/jwt.strategy';
 
 describe('RoomsController (e2e) unauthorized', () => {
   let app: INestApplication;
@@ -41,8 +40,10 @@ describe('RoomsController (e2e)', () => {
       canActivate(context: ExecutionContext): boolean {
         const request = context.switchToHttp().getRequest();
         request.user = {
-          id: '1',
+          id: request.headers['x-user'] || '1',
+          roles: [],
         };
+        console.log(request.user.id);
         return true;
       }
     }
@@ -123,5 +124,26 @@ describe('RoomsController (e2e)', () => {
       .delete(`/api/v1/rooms/${roomId}`)
       .expect(HttpStatus.OK);
     await agent.get(`/api/v1/rooms/${roomId}`).expect(HttpStatus.NOT_FOUND);
+  });
+
+  it('/api/v1/rooms/:id/users (POST)', async () => {
+    const agent = request(app.getHttpServer());
+    let response = await agent
+      .post('/api/v1/rooms')
+      .send({ name: 'test' })
+      .expect(HttpStatus.CREATED);
+    const roomId = response.body.id;
+    response = await agent
+      .post(`/api/v1/rooms/${roomId}/users`)
+      .set('X-User', '2')
+      .expect(HttpStatus.CREATED);
+    await agent
+      .get(`/api/v1/rooms/${roomId}`)
+      .set('X-User', '2')
+      .expect(HttpStatus.OK);
+    await agent
+      .delete(`/api/v1/rooms/${roomId}`)
+      .set('X-User', '2')
+      .expect(HttpStatus.FORBIDDEN);
   });
 });

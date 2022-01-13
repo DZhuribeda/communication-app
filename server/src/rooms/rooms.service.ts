@@ -42,9 +42,8 @@ export class RoomsService {
     return rooms.map((room) => this.getRoomRepresentation(room, userId));
   }
 
-  findOne(id: number, userId: string) {
-    const room = this.roomsRepository.findOne(id);
-    return this.getRoomRepresentation(room, userId);
+  findOne(id: number) {
+    return this.roomsRepository.findOne(id);
   }
 
   update(id: number, updateRoomDto: UpdateRoomDto) {
@@ -61,6 +60,11 @@ export class RoomsService {
 
   removeUserFromRoom(roomId: number, userId: string) {
     return this.roomsRepository.removeUserFromRoom(roomId, userId);
+  }
+
+  getUserRoomRole(roomId: number, userId: string) {
+    const roomMembers = this.roomsRepository.getRoomMembers(roomId);
+    return roomMembers.find((member) => member.userId === userId)?.role;
   }
 
   getRoomRepresentation(room: Room, userId: string) {

@@ -1,4 +1,4 @@
 export enum RoomRoles {
-  owner = 'admin',
+  owner = 'owner',
   member = 'member',
 }
