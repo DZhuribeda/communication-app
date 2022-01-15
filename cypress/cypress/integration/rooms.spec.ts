@@ -4,13 +4,14 @@ const email = faker.internet.email();
 const password = faker.internet.password();
 const ROOM_NAME = 'Test room'
 
-describe('Login', () => {
+describe('Rooms', () => {
   before(() => {
     cy.createUser(email, password);
+    cy.loginUser(email, password);
   });
 
   beforeEach(() => {
-    cy.loginUser(email, password);
+    Cypress.Cookies.preserveOnce('ory_kratos_session')
   });
 
   it('empty state', () => {
