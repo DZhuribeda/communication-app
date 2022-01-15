@@ -1,4 +1,4 @@
-import React from "react";
+import React, { MouseEventHandler } from "react";
 import classNames from "classnames";
 import { Size } from "../general";
 
@@ -14,11 +14,13 @@ export enum ButtonAction {
 
 type ButtonProps = {
   size: Size;
-  name: string;
+  name?: string;
   value?: string;
   type?: "button" | "submit" | "reset";
   action?: ButtonAction;
   disabled?: boolean;
+  fullWidth?: boolean;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 };
 
 // eslint-disable-next-line react/display-name
@@ -35,6 +37,8 @@ export const Button = React.forwardRef<
       action = ButtonAction.PRIMARY,
       type = "button",
       disabled = false,
+      fullWidth = false,
+      onClick,
     },
     ref
   ) => {
@@ -68,10 +72,13 @@ export const Button = React.forwardRef<
         value={value}
         type={type}
         disabled={disabled}
+        onClick={onClick}
         className={classNames(
-          "w-full rounded-lg font-medium",
+          "rounded-lg font-medium",
           sizeClass[size],
-          colorClass[action]
+          colorClass[action], {
+            'w-full': fullWidth
+          }
         )}
       >
         {children}
