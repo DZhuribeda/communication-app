@@ -76,8 +76,9 @@ export const Button = React.forwardRef<
         className={classNames(
           "rounded-lg font-medium",
           sizeClass[size],
-          colorClass[action], {
-            'w-full': fullWidth
+          colorClass[action],
+          {
+            "w-full": fullWidth,
           }
         )}
       >

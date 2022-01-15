@@ -17,9 +17,7 @@ export function Layout({
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto py-6 px-4 table:px-6 desktop:px-8 flex justify-between">
           <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
-        {actions && <div>
-          {actions}
-        </div>}
+          {actions && <div>{actions}</div>}
         </div>
       </header>
       <main>
