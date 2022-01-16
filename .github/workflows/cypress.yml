@@ -10,6 +10,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Build the stack
         run: docker-compose up -d
+      - name: Stack status
+        run: docker-compose ps
       - name: Build UI
         working-directory: frontend
         run: |
@@ -32,3 +34,6 @@ jobs:
         with:
           name: cypress-videos
           path: cypress/cypress/videos
+      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v1
