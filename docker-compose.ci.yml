@@ -2,4 +2,6 @@ version: "3.7"
 
 services:
   server:
+    environment:
+      JWKS_URI: http://oathkeeper:4456/.well-known/jwks.json
     command: npm run start:prod
