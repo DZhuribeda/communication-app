@@ -8,8 +8,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        
       - name: Build the stack
         run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+      - name: Wait for migration
+        run: docker wait communication-app_kratos-migrate_1
       - name: Stack status
         run: docker-compose ps
       - name: Build UI
