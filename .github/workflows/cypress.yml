@@ -8,10 +8,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Run db migrations
-        run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d postgresd kratos-migrate
+      - name: Run db
+        run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d postgresd wait-for-db
       - name: Wait for migration
-        run: docker wait communication-app_kratos-migrate_1
+        run: docker wait communication-app_wait-for-db_1
+      - name: Run db migrations
+        run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d kratos-migrate keto-migrate
+      - name: Wait for migration
+        run: docker wait communication-app_kratos-migrate_1 communication-app_keto-migrate_1
       - name: Build the stack
         run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d
       - name: Stack status
