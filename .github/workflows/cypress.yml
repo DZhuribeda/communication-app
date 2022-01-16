@@ -9,7 +9,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build the stack
-        run: docker-compose up -d
+        run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml up -d
       - name: Stack status
         run: docker-compose ps
       - name: Build UI
