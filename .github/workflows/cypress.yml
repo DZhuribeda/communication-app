@@ -31,6 +31,8 @@ jobs:
         with:
           working-directory: cypress
           browser: chrome
+      - name: Check Kratos config
+        run: docker-compose exec kratos cat /etc/config/kratos/kratos.yml
       - uses: actions/upload-artifact@v2
         if: failure()
         with:
