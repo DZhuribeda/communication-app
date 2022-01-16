@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
-import Home from "@/pages/index";
 import { QueryClientProvider, QueryClient } from "react-query";
+import Home from "../pages/rooms";
 
 function renderComponent() {
   return render(

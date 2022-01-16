@@ -16,6 +16,7 @@ export function NodeInputSubmit<T>({
       {...register(attributes.name, {
         required: attributes.required,
       })}
+      fullWidth
       type="submit"
       size={Size.md}
       value={attributes.value || ""}

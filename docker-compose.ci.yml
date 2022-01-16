@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+  server:
+    environment:
+      JWKS_URI: http://oathkeeper:4456/.well-known/jwks.json
+    command: npm run start:prod
+  wait-for-db:
+    image: ubuntu:18.04
+    depends_on:
+      - "postgresd"
+    command: ["/opt/wait-for-it.sh", "postgresd:5432", "--", "echo", "db is up"]
+    volumes:
+        - ./wait-for-it.sh:/opt/wait-for-it.sh
