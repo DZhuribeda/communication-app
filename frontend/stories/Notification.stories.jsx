@@ -12,14 +12,17 @@ import {
 export default {
   title: "Notification",
   component: Notification,
-} as ComponentMeta<typeof Notification>;
+};
 
-const Template: ComponentStory<typeof Notification> = (args) => (
-  <div style={{ width: 320 }}>
-    <button onClick={args.action}>Trigger</button>
-    <Notification />
-  </div>
-);
+const Template = (args) => {
+  const { action } = args;
+  return (
+    <div style={{ width: 320 }}>
+      <button onClick={action}>Trigger</button>
+      <Notification />
+    </div>
+  );
+};
 
 export const Success = Template.bind({});
 
