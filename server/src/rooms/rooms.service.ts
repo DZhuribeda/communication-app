@@ -33,7 +33,7 @@ export class RoomsService {
       createRoomDto.name,
       generateRandomSlug(),
     );
-    this.roomsRepository.addUserToRoom(room.id, userId, RoomRoles.owner);
+    this.roomsRepository.addUserToRoom(room.slug, userId, RoomRoles.owner);
     return room;
   }
 
@@ -46,16 +46,20 @@ export class RoomsService {
     return this.roomsRepository.findOne(id);
   }
 
-  update(id: number, updateRoomDto: UpdateRoomDto) {
-    return this.roomsRepository.update(id, updateRoomDto.name);
+  findBySlug(slug: string) {
+    return this.roomsRepository.findBySlug(slug);
   }
 
-  remove(id: number) {
-    return this.roomsRepository.remove(id);
+  update(slug: string, updateRoomDto: UpdateRoomDto) {
+    return this.roomsRepository.update(slug, updateRoomDto.name);
   }
 
-  addUserToRoom(roomId: number, userId: string) {
-    return this.roomsRepository.addUserToRoom(roomId, userId, RoomRoles.member);
+  remove(slug: string) {
+    return this.roomsRepository.remove(slug);
+  }
+
+  addUserToRoom(slug: string, userId: string) {
+    return this.roomsRepository.addUserToRoom(slug, userId, RoomRoles.member);
   }
 
   removeUserFromRoom(roomId: number, userId: string) {
@@ -64,7 +68,10 @@ export class RoomsService {
 
   getUserRoomRole(roomId: number, userId: string) {
     const roomMembers = this.roomsRepository.getRoomMembers(roomId);
-    return roomMembers.find((member) => member.userId === userId)?.role;
+    return (
+      roomMembers.find((member) => member.userId === userId)?.role ??
+      RoomRoles.guest
+    );
   }
 
   getRoomRepresentation(room: Room, userId: string) {
@@ -72,13 +79,11 @@ export class RoomsService {
       return null;
     }
     const roomMembers = this.roomsRepository.getRoomMembers(room.id);
-    const userRole = roomMembers.find(
-      (member) => member.userId === userId,
-    )?.role;
+    const userRole = this.getUserRoomRole(room.id, userId);
     return {
       ...room,
       members: roomMembers.length,
-      permissions: userRole ? getRoleActions(userRole) : [],
+      permissions: getRoleActions(userRole),
     };
   }
 }

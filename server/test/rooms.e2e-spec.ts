@@ -43,7 +43,6 @@ describe('RoomsController (e2e)', () => {
           id: request.headers['x-user'] || '1',
           roles: [],
         };
-        console.log(request.user.id);
         return true;
       }
     }
@@ -94,7 +93,10 @@ describe('RoomsController (e2e)', () => {
       .send({ name: 'test' })
       .expect(HttpStatus.CREATED);
     const roomId = response.body.id;
-    response = await agent.get(`/api/v1/rooms/${roomId}`).expect(HttpStatus.OK);
+    const roomSlug = response.body.slug;
+    response = await agent
+      .get(`/api/v1/rooms/${roomSlug}`)
+      .expect(HttpStatus.OK);
     expect(response.body.id).toBe(roomId);
   });
 
@@ -105,11 +107,14 @@ describe('RoomsController (e2e)', () => {
       .send({ name: 'test' })
       .expect(HttpStatus.CREATED);
     const roomId = response.body.id;
+    const roomSlug = response.body.slug;
     response = await agent
-      .patch(`/api/v1/rooms/${roomId}`)
+      .patch(`/api/v1/rooms/${roomSlug}`)
       .send({ name: 'test2' })
       .expect(HttpStatus.OK);
-    response = await agent.get(`/api/v1/rooms/${roomId}`).expect(HttpStatus.OK);
+    response = await agent
+      .get(`/api/v1/rooms/${roomSlug}`)
+      .expect(HttpStatus.OK);
     expect(response.body.id).toBe(roomId);
     expect(response.body.name).toBe('test2');
   });
@@ -120,8 +125,9 @@ describe('RoomsController (e2e)', () => {
       .send({ name: 'test' })
       .expect(HttpStatus.CREATED);
     const roomId = response.body.id;
+    const roomSlug = response.body.slug;
     response = await agent
-      .delete(`/api/v1/rooms/${roomId}`)
+      .delete(`/api/v1/rooms/${roomSlug}`)
       .expect(HttpStatus.OK);
     await agent.get(`/api/v1/rooms/${roomId}`).expect(HttpStatus.NOT_FOUND);
   });
@@ -132,18 +138,30 @@ describe('RoomsController (e2e)', () => {
       .post('/api/v1/rooms')
       .send({ name: 'test' })
       .expect(HttpStatus.CREATED);
-    const roomId = response.body.id;
+    const roomSlug = response.body.slug;
     response = await agent
-      .post(`/api/v1/rooms/${roomId}/users`)
+      .post(`/api/v1/rooms/${roomSlug}/users`)
       .set('X-User', '2')
       .expect(HttpStatus.CREATED);
     await agent
-      .get(`/api/v1/rooms/${roomId}`)
+      .get(`/api/v1/rooms/${roomSlug}`)
       .set('X-User', '2')
       .expect(HttpStatus.OK);
     await agent
-      .delete(`/api/v1/rooms/${roomId}`)
+      .delete(`/api/v1/rooms/${roomSlug}`)
       .set('X-User', '2')
       .expect(HttpStatus.FORBIDDEN);
+  });
+  it('guest user can read', async () => {
+    const agent = request(app.getHttpServer());
+    const response = await agent
+      .post('/api/v1/rooms')
+      .send({ name: 'test' })
+      .expect(HttpStatus.CREATED);
+    const roomSlug = response.body.slug;
+    await agent
+      .get(`/api/v1/rooms/${roomSlug}`)
+      .set('X-User', '2')
+      .expect(HttpStatus.OK);
   });
 });
