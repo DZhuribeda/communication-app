@@ -12,6 +12,7 @@ export function getRoleActions(role: RoomRoles): RoomActions[] {
     case RoomRoles.owner:
       return [RoomActions.read, RoomActions.update, RoomActions.remove];
     case RoomRoles.member:
+    case RoomRoles.guest:
       return [RoomActions.read];
     default:
       return [];

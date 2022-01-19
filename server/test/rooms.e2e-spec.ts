@@ -152,4 +152,16 @@ describe('RoomsController (e2e)', () => {
       .set('X-User', '2')
       .expect(HttpStatus.FORBIDDEN);
   });
+  it('guest user can read', async () => {
+    const agent = request(app.getHttpServer());
+    const response = await agent
+      .post('/api/v1/rooms')
+      .send({ name: 'test' })
+      .expect(HttpStatus.CREATED);
+    const roomSlug = response.body.slug;
+    await agent
+      .get(`/api/v1/rooms/${roomSlug}`)
+      .set('X-User', '2')
+      .expect(HttpStatus.OK);
+  });
 });
