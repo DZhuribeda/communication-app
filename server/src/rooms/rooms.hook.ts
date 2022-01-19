@@ -12,7 +12,8 @@ export class RoomHook
 
   async run(request: Request) {
     const userId = request.user?.id;
-    const room = this.roomsService.findOne(+request.params.id);
+    console.log(request.params.slug);
+    const room = this.roomsService.findBySlug(request.params.slug);
     return {
       ...room,
       userRole: this.roomsService.getUserRoomRole(room.id, userId),

@@ -37,9 +37,9 @@ export class RoomsController {
     return this.roomsService.findAll(user.id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string, @CurrentUser() user: User) {
-    const room = this.roomsService.findOne(+id);
+  @Get(':slug')
+  findOne(@Param('slug') slug: string, @CurrentUser() user: User) {
+    const room = this.roomsService.findBySlug(slug);
     if (!room) {
       throw new NotFoundException();
     }
@@ -47,22 +47,22 @@ export class RoomsController {
     return this.roomsService.getRoomRepresentation(room, user.id);
   }
 
-  @Patch(':id')
+  @Patch(':slug')
   @UseGuards(AccessGuard)
   @UseAbility(RoomActions.update, RoomWithUserRole, RoomHook)
-  update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
-    return this.roomsService.update(+id, updateRoomDto);
+  update(@Param('slug') slug: string, @Body() updateRoomDto: UpdateRoomDto) {
+    return this.roomsService.update(slug, updateRoomDto);
   }
 
-  @Delete(':id')
+  @Delete(':slug')
   @UseGuards(AccessGuard)
   @UseAbility(RoomActions.remove, RoomWithUserRole, RoomHook)
-  remove(@Param('id') id: string) {
-    return this.roomsService.remove(+id);
+  remove(@Param('slug') slug: string) {
+    return this.roomsService.remove(slug);
   }
 
-  @Post(':id/users')
-  addUserToRoom(@Param('id') id: string, @CurrentUser() user: User) {
-    return this.roomsService.addUserToRoom(+id, user.id);
+  @Post(':slug/users')
+  addUserToRoom(@Param('slug') slug: string, @CurrentUser() user: User) {
+    return this.roomsService.addUserToRoom(slug, user.id);
   }
 }

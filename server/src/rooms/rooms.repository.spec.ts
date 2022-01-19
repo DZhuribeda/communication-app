@@ -27,8 +27,8 @@ describe('RoomsRepository', () => {
   it('should findAll rooms', () => {
     const userId = 'test';
     expect(service.findAll(userId)).toHaveLength(0);
-    service.create('test', 'test');
-    service.addUserToRoom(1, userId, RoomRoles.owner);
+    const room = service.create('test', 'test');
+    service.addUserToRoom(room.slug, userId, RoomRoles.owner);
     expect(service.findAll(userId)).toHaveLength(1);
     service.create('test1', 'test');
     expect(service.findAll(userId)).toHaveLength(1);
@@ -43,7 +43,7 @@ describe('RoomsRepository', () => {
   });
   it('should update room', () => {
     const room = service.create('test', 'test');
-    service.update(room.id, 'test2');
+    service.update(room.slug, 'test2');
     const fetchedRoom = service.findOne(room.id);
     expect(fetchedRoom).toBeDefined();
     expect(fetchedRoom.id).toBe(1);
@@ -54,16 +54,16 @@ describe('RoomsRepository', () => {
     const userId = 1;
     expect(service.findAll(userId)).toHaveLength(0);
     const room = service.create('test', 'test');
-    service.remove(room.id);
+    service.remove(room.slug);
     expect(service.findAll(userId)).toHaveLength(0);
   });
   it('should manage user in room', () => {
     const userId = 'testing';
     const userId1 = 'testing1';
     const room = service.create('test', 'test');
-    service.addUserToRoom(room.id, userId, RoomRoles.owner);
+    service.addUserToRoom(room.slug, userId, RoomRoles.owner);
     expect(service.getRoomMembers(room.id)).toHaveLength(1);
-    service.addUserToRoom(room.id, userId1, RoomRoles.owner);
+    service.addUserToRoom(room.slug, userId1, RoomRoles.owner);
     expect(service.getRoomMembers(room.id)).toHaveLength(2);
     service.removeUserFromRoom(room.id, userId);
     expect(service.findAll(userId)).toHaveLength(0);

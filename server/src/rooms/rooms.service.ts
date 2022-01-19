@@ -33,7 +33,7 @@ export class RoomsService {
       createRoomDto.name,
       generateRandomSlug(),
     );
-    this.roomsRepository.addUserToRoom(room.id, userId, RoomRoles.owner);
+    this.roomsRepository.addUserToRoom(room.slug, userId, RoomRoles.owner);
     return room;
   }
 
@@ -46,16 +46,20 @@ export class RoomsService {
     return this.roomsRepository.findOne(id);
   }
 
-  update(id: number, updateRoomDto: UpdateRoomDto) {
-    return this.roomsRepository.update(id, updateRoomDto.name);
+  findBySlug(slug: string) {
+    return this.roomsRepository.findBySlug(slug);
   }
 
-  remove(id: number) {
-    return this.roomsRepository.remove(id);
+  update(slug: string, updateRoomDto: UpdateRoomDto) {
+    return this.roomsRepository.update(slug, updateRoomDto.name);
   }
 
-  addUserToRoom(roomId: number, userId: string) {
-    return this.roomsRepository.addUserToRoom(roomId, userId, RoomRoles.member);
+  remove(slug: string) {
+    return this.roomsRepository.remove(slug);
+  }
+
+  addUserToRoom(slug: string, userId: string) {
+    return this.roomsRepository.addUserToRoom(slug, userId, RoomRoles.member);
   }
 
   removeUserFromRoom(roomId: number, userId: string) {

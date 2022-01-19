@@ -27,18 +27,23 @@ export class RoomsRepository {
     return this.rooms.find((room) => room.id === id);
   }
 
-  update(id: number, name: string) {
-    const room = this.findOne(id);
+  findBySlug(slug: string) {
+    return this.rooms.find((room) => room.slug === slug);
+  }
+
+  update(slug: string, name: string) {
+    const room = this.findBySlug(slug);
     room.name = name;
   }
 
-  remove(id: number) {
-    this.rooms = this.rooms.filter((room) => room.id !== id);
+  remove(slug: string) {
+    this.rooms = this.rooms.filter((room) => room.slug !== slug);
   }
 
-  addUserToRoom(roomId: number, userId: string, role: RoomRoles) {
+  addUserToRoom(slug: string, userId: string, role: RoomRoles) {
+    const room = this.findBySlug(slug);
     this.roomMembers.push({
-      roomId,
+      roomId: room.id,
       userId,
       role,
     });
