@@ -83,7 +83,7 @@ export class RoomsService {
     return {
       ...room,
       members: roomMembers.length,
-      permissions: userRole ? getRoleActions(userRole) : [],
+      permissions: getRoleActions(userRole),
     };
   }
 }
