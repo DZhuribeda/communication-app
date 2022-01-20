@@ -2,15 +2,9 @@ import React, { useEffect, useRef } from "react";
 type Props = {
   audioTrack: any;
   videoTrack: any;
-  isMe: boolean;
   audioMuted?: boolean;
 };
-export function PeerView({
-  audioTrack,
-  videoTrack,
-  isMe,
-  audioMuted = true,
-}: Props) {
+export function PeerView({ audioTrack, videoTrack, audioMuted = true }: Props) {
   const videoElem = useRef<HTMLVideoElement>(null);
   const audioElem = useRef<HTMLAudioElement>(null);
   useEffect(() => {
@@ -58,14 +52,14 @@ export function PeerView({
     }
   }, [videoTrack, videoElem]);
   return (
-    <div style={{ width: 400 }}>
+    <div>
       <video ref={videoElem} autoPlay playsInline muted controls={false} />
 
       <audio
         ref={audioElem}
         autoPlay
         playsInline
-        muted={isMe || audioMuted}
+        muted={audioMuted}
         controls={false}
       />
     </div>

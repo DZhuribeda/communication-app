@@ -1,8 +1,11 @@
+import { useRouter } from "next/router";
 import { useQuery } from "react-query";
 import { Room } from "../../libs/entities/room";
 import { Button } from "../core/button/button";
 import { Size } from "../core/general";
 import { Link } from "../core/link/link";
+import { Empty } from "../layout/empty";
+import { Loading } from "../layout/loading";
 
 const fetchRooms = () =>
   fetch(`${process.env.NEXT_PUBLIC_API_BASE_PATH}/api/v1/rooms`, {
@@ -10,26 +13,15 @@ const fetchRooms = () =>
   }).then((res) => res.json());
 
 export function RoomsList() {
+  const router = useRouter();
   const { isLoading, isError, data } = useQuery<Room[]>(["rooms"], () =>
     fetchRooms()
   );
   if (isLoading) {
-    return (
-      <div className="flex h-80 flex-col items-center justify-center text-center">
-        <div
-          className="w-12 h-12 border-4 border-primary-600 rounded-full animate-spin"
-          style={{ borderRightColor: "transparent" }}
-        ></div>
-        <div className="text-xl pt-4">Loading</div>
-      </div>
-    );
+    return <Loading />;
   }
   if (isError) {
-    return (
-      <div className="flex h-80 flex-col items-center justify-center text-center">
-        <div className="text-xl">Error during loading rooms</div>
-      </div>
-    );
+    return <Empty message="Error during loading rooms" />;
   }
   return data === undefined || data.length === 0 ? (
     <div className="px-4 py-6 tablet:px-0">
@@ -53,7 +45,13 @@ export function RoomsList() {
                 <div>{room.members} members</div>
               </div>
               <div>
-                <Button size={Size.sm} fullWidth>
+                <Button
+                  size={Size.sm}
+                  fullWidth
+                  onClick={() => {
+                    router.push(`/rooms/${room.slug}`);
+                  }}
+                >
                   Join
                 </Button>
               </div>

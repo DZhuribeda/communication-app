@@ -1,6 +1,6 @@
 import produce from "immer";
 import { SetState, GetState } from "zustand";
-import { AppState } from "./useStore";
+import { AppState } from "./../useStore";
 
 type Peer = {
   id: string;

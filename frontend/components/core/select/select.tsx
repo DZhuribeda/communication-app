@@ -1,18 +1,20 @@
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, SelectorIcon } from "@heroicons/react/solid";
 import classNames from "classnames";
 
 type SelectItem = {
+  id: string;
   label: string;
 };
 
 type SelectProps = {
   label: string;
   options: SelectItem[];
-  selected: SelectItem;
+  selected: SelectItem | null;
   setSelected: (selected: SelectItem) => void;
   error?: string;
+  placeholder?: string;
 };
 
 export function Select({
@@ -21,6 +23,7 @@ export function Select({
   selected,
   setSelected,
   error,
+  placeholder,
 }: SelectProps) {
   return (
     <div className="w-72">
@@ -31,15 +34,19 @@ export function Select({
           </Listbox.Label>
           <Listbox.Button
             className={classNames(
-              "relative w-full py-2 pl-3 pr-10 text-left text-md font-normal text-gray-900 bg-white rounded-lg shadow-xs cursor-default border focus:outline-none",
+              "relative w-full py-2 pl-3 pr-10 text-left text-md font-normal bg-white rounded-lg shadow-xs cursor-default border focus:outline-none",
               {
                 "border-gray-300 focus:border-primary-300 focus:shadow-focus ":
                   !error,
                 "border-error-300 focus:shadow-error-100": error,
+                "text-gray-900": selected?.label,
+                "text-gray-500": !selected?.label,
               }
             )}
           >
-            <span className="block truncate">{selected.label}</span>
+            <span className="block truncate">
+              {selected?.label ?? placeholder}
+            </span>
             <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
               <SelectorIcon
                 className="w-5 h-5 text-gray-500"
@@ -53,7 +60,7 @@ export function Select({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute w-full py-1 mt-1 overflow-auto text-sm font-normal bg-white rounded-md shadow-xs max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <Listbox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-sm font-normal bg-white rounded-md shadow-xs max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none">
               {options.map((option, optionIdx) => (
                 <Listbox.Option
                   key={optionIdx}

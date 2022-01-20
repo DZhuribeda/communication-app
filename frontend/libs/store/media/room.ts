@@ -6,8 +6,8 @@ import {
   SctpParameters,
 } from "mediasoup-client/lib/types";
 import { SetState, GetState } from "zustand";
-import { AppState } from "./useStore";
-import { asyncEmit, socket } from "../socket";
+import { AppState } from "./../useStore";
+import { asyncEmit, socket } from "../../socket";
 
 const produce = true;
 const consume = true;

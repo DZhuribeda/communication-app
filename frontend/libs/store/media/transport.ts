@@ -6,8 +6,8 @@ import {
   Transport,
 } from "mediasoup-client/lib/types";
 import { SetState, GetState } from "zustand";
-import { socket } from "../socket";
-import { AppState } from "./useStore";
+import { socket } from "../../socket";
+import { AppState } from "./../useStore";
 
 const PC_PROPRIETARY_CONSTRAINTS = {
   optional: [{ googDscp: true }],
