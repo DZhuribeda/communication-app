@@ -13,7 +13,6 @@ export function SelfView() {
   return (
     <div>
       <PeerView
-        isMe
         audioTrack={audioProducer ? audioProducer.track : null}
         videoTrack={videoProducer ? videoProducer.track : null}
       />

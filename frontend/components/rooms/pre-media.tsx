@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Room } from "../../libs/entities/room";
+import { RoomState } from "../../libs/entities/room";
 import { useStore } from "../../libs/store/useStore";
+import { Button } from "../core/button/button";
+import { Size } from "../core/general";
 import { Select } from "../core/select/select";
 import { CameraPreview } from "../media/camera-preview";
-import { PeerView } from "../media/peer-view";
 
 function WebcamSelector() {
   const webcams = useStore((state) => state.webcams);
@@ -146,10 +147,11 @@ function MicrophoneLevel() {
   return <MicrophonePreview getAudioLevel={getMicLevel} />;
 }
 
-export function PreMedia({ room }: { room: Room }) {
+export function PreMedia() {
   const initiateWebcam = useStore((state) => state.initiateWebcam);
   const initiateMic = useStore((state) => state.initiateMic);
   const initiateSpeaker = useStore((state) => state.initiateSpeaker);
+  const setRoomState = useStore((state) => state.setRoomState);
 
   useEffect(() => {
     initiateWebcam();
@@ -162,10 +164,18 @@ export function PreMedia({ room }: { room: Room }) {
         <MicrophoneLevel />
         <CameraPreview />
       </div>
-      <div>
+      <div className="flex flex-col gap-2">
         <WebcamSelector />
         <MicSelector />
         <SpeakerSelector />
+        <Button
+          size={Size.md}
+          onClick={() => {
+            setRoomState(RoomState.entered);
+          }}
+        >
+          Enter
+        </Button>
       </div>
     </div>
   );

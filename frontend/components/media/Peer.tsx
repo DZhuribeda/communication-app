@@ -19,7 +19,6 @@ export function Peer({ id }: { id: string }) {
   return (
     <div>
       <PeerView
-        isMe={false}
         audioTrack={audioProducer ? audioProducer.track : null}
         videoTrack={videoProducer ? videoProducer.track : null}
       />

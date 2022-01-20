@@ -1,7 +1,9 @@
 import axios from "axios";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { useQuery } from "react-query";
 import { Room } from "../../libs/entities/room";
+import { useStore } from "../../libs/store/useStore";
 import { Size } from "../core/general";
 import { Link } from "../core/link/link";
 import { Empty } from "../layout/empty";
@@ -11,6 +13,7 @@ import { PreMedia } from "./pre-media";
 export function MediaRoom() {
   const router = useRouter();
   const roomSlug = router.query.slug as string;
+  const setRoom = useStore((state) => state.setRoom);
   const { isLoading, isError, data } = useQuery(
     ["room", roomSlug],
     ({ signal }) =>
@@ -19,6 +22,15 @@ export function MediaRoom() {
         { withCredentials: true, signal }
       )
   );
+  useEffect(() => {
+    if (!data?.data) {
+      return;
+    }
+    setRoom(data.data);
+    return () => {
+      setRoom(null);
+    };
+  }, [data, setRoom]);
   if (isLoading) {
     return <Loading />;
   }
@@ -38,7 +50,7 @@ export function MediaRoom() {
     </div>
   ) : (
     <div className="px-4 py-6 tablet:px-0">
-      <PreMedia room={data.data} />
+      <PreMedia />
     </div>
   );
 }

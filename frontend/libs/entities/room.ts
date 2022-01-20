@@ -12,3 +12,8 @@ export type Room = {
   slug: string;
   permissions: RoomActions[];
 };
+
+export enum RoomState {
+  configuration,
+  entered,
+}

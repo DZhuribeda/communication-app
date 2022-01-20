@@ -8,6 +8,7 @@ import {
 import { SetState, GetState } from "zustand";
 import { AppState } from "./../useStore";
 import { asyncEmit, socket } from "../../socket";
+import { Room, RoomState } from "../../entities/room";
 
 const produce = true;
 const consume = true;
@@ -22,6 +23,11 @@ type JoinToRoomResponse = {
 
 export interface RoomSlice {
   roomId: string;
+  roomState: RoomState;
+  room: Room | null;
+  setRoom: (room: Room | null) => void;
+  resetRoom: () => void;
+  setRoomState: (roomState: RoomState) => void;
   joinToRoom: () => Promise<void>;
 }
 
@@ -29,7 +35,22 @@ export const createRoomSlice = (
   set: SetState<AppState>,
   get: GetState<AppState>
 ) => ({
+  roomState: RoomState.configuration,
+  room: null,
   roomId: "testing",
+  setRoom: (room: Room | null) => {
+    set((state) => ({ ...state, room }));
+  },
+  setRoomState: (roomState: RoomState) => {
+    set((state) => ({ ...state, roomState }));
+  },
+  resetRoom: () => {
+    set((state) => ({
+      ...state,
+      roomState: RoomState.configuration,
+      room: null,
+    }));
+  },
   joinToRoom: async () => {
     const roomId = get().roomId;
     const data = await asyncEmit<JoinToRoomResponse>(socket, "joinToRoom", {
