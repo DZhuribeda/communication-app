@@ -1,13 +1,14 @@
 import create from "zustand";
 import { devtools } from "zustand/middleware";
 
-import { createConsumersSlice, ConsumersSlice } from "./consumers";
-import { createDeviceSlice, DeviceSlice } from "./device";
-import { createMicrophoneSlice, MicrophoneSlice } from "./microphone";
-import { createPeersSlice, PeersSlice } from "./peers";
-import { createRoomSlice, RoomSlice } from "./room";
-import { createTransportSlice, TransportSlice } from "./transport";
-import { createWebcamSlice, WebcamSlice } from "./webcam";
+import { createConsumersSlice, ConsumersSlice } from "./media/consumers";
+import { createDeviceSlice, DeviceSlice } from "./media/device";
+import { createMicrophoneSlice, MicrophoneSlice } from "./media/microphone";
+import { createPeersSlice, PeersSlice } from "./media/peers";
+import { createRoomSlice, RoomSlice } from "./media/room";
+import { createTransportSlice, TransportSlice } from "./media/transport";
+import { createWebcamSlice, WebcamSlice } from "./media/webcam";
+import { createSpeakerSlice, SpeakerSlice } from "./media/speaker";
 
 export type AppState = DeviceSlice &
   RoomSlice &
@@ -15,6 +16,7 @@ export type AppState = DeviceSlice &
   MicrophoneSlice &
   WebcamSlice &
   PeersSlice &
+  SpeakerSlice &
   ConsumersSlice;
 
 export const useStore = create<AppState>(
@@ -26,5 +28,6 @@ export const useStore = create<AppState>(
     ...createWebcamSlice(set, get),
     ...createPeersSlice(set, get),
     ...createConsumersSlice(set, get),
+    ...createSpeakerSlice(set, get),
   }))
 );

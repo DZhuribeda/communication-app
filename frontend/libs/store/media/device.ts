@@ -1,7 +1,7 @@
 import { Device } from "mediasoup-client";
 import { RtpCapabilities } from "mediasoup-client/lib/RtpParameters";
 import { SetState, GetState } from "zustand";
-import { AppState } from "./useStore";
+import { AppState } from "./../useStore";
 
 export interface DeviceSlice {
   device: Device | null;

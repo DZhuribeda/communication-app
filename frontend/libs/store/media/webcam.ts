@@ -1,9 +1,9 @@
 import { Producer } from "mediasoup-client/lib/types";
 import { SetState, GetState } from "zustand";
-import { asyncEmit, socket } from "../socket";
-import { AppState } from "./useStore";
+import { asyncEmit, socket } from "../../socket";
+import { AppState } from "../useStore";
 
-const VIDEO_CONSTRAINS = {
+export const VIDEO_CONSTRAINS = {
   qvga: { width: { ideal: 320 }, height: { ideal: 240 } },
   vga: { width: { ideal: 640 }, height: { ideal: 480 } },
   hd: { width: { ideal: 1280 }, height: { ideal: 720 } },
@@ -23,8 +23,13 @@ type VIDEO_TYPES = keyof typeof VIDEO_CONSTRAINS;
 export interface WebcamSlice {
   resolution: VIDEO_TYPES;
   webcam: MediaDeviceInfo | null;
-  webcams: Map<string, MediaDeviceInfo>;
+  webcamTrackInitialization: boolean;
+  webcamTrack: MediaStreamTrack | null;
   webcamProducer: Producer | null;
+  webcamsInProgress: boolean;
+  webcams: Map<string, MediaDeviceInfo>;
+  initiateWebcam: () => Promise<void>;
+  selectWebcam: (deviceId: string) => void;
   enableWebcam: () => Promise<void>;
   updateWebcams: () => Promise<void>;
   disableWebcam: () => Promise<void>;
@@ -36,13 +41,31 @@ export const createWebcamSlice = (
   set: SetState<AppState>,
   get: GetState<AppState>
 ) => ({
-  webcamProducer: null,
+  webcamsInProgress: false,
   webcams: new Map(),
   webcam: null,
+  webcamTrackInitialization: false,
+  webcamTrack: null,
+  webcamProducer: null,
   resolution: "hd" as VIDEO_TYPES,
+  initiateWebcam: async () => {
+    await get().updateWebcams();
+    const webcams = get().webcams;
+    const defaultWebcam = Array.from(webcams.values())[0];
+    set((state) => ({ ...state, webcam: defaultWebcam ?? null }));
+  },
+  selectWebcam: (deviceId: string) => {
+    if (get().webcam?.deviceId === deviceId) {
+      return;
+    }
+    if (!get().webcams.has(deviceId)) {
+      throw new Error("Invalid deviceId");
+    }
+    set((state) => ({ ...state, webcam: state.webcams.get(deviceId) ?? null }));
+  },
   updateWebcams: async () => {
     console.debug("_updateWebcams()");
-
+    set((state) => ({ ...state, webcamsInProgress: true }));
     // Reset the list.
     const webcams = new Map();
 
@@ -52,24 +75,11 @@ export const createWebcamSlice = (
 
     for (const device of devices) {
       if (device.kind !== "videoinput") continue;
-
       webcams.set(device.deviceId, device);
     }
-
-    const array = Array.from(webcams.values());
-    const len = array.length;
-    const webcam = get().webcam;
-    const currentWebcamId = webcam ? webcam.deviceId : undefined;
-
-    console.debug("_updateWebcams() [webcams:%o]", array);
-
-    if (len === 0) {
-      set((state) => ({ webcam: null }));
-    } else if (!webcams.has(currentWebcamId)) {
-      set((state) => ({ webcam: array[0] }));
-    }
-    set((state) => ({ ...state, webcams }));
+    set((state) => ({ ...state, webcams, webcamsInProgress: false }));
   },
+
   enableWebcam: async () => {
     console.debug("enableWebcam()");
 

@@ -1,8 +1,8 @@
 import produce from "immer";
 import { Consumer, RtpParameters, MediaKind } from "mediasoup-client/lib/types";
 import { SetState, GetState } from "zustand";
-import { asyncEmit, socket } from "../socket";
-import { AppState } from "./useStore";
+import { asyncEmit, socket } from "../../socket";
+import { AppState } from "../useStore";
 
 export interface ConsumersSlice {
   consumers: Record<string, Consumer>;

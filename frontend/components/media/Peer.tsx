@@ -1,6 +1,6 @@
 import React from "react";
 import { useStore } from "../../libs/store/useStore";
-import { PeerView } from "./PeerView";
+import { PeerView } from "./peer-view";
 
 export function Peer({ id }: { id: string }) {
   const { audioProducer, videoProducer } = useStore((state) => {
@@ -19,7 +19,6 @@ export function Peer({ id }: { id: string }) {
   return (
     <div>
       <PeerView
-        isMe={false}
         audioTrack={audioProducer ? audioProducer.track : null}
         videoTrack={videoProducer ? videoProducer.track : null}
       />
