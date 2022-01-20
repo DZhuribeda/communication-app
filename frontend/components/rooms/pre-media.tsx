@@ -164,18 +164,20 @@ export function PreMedia() {
         <MicrophoneLevel />
         <CameraPreview />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 w-72">
         <WebcamSelector />
         <MicSelector />
         <SpeakerSelector />
-        <Button
-          size={Size.md}
-          onClick={() => {
-            setRoomState(RoomState.entered);
-          }}
-        >
-          Enter
-        </Button>
+        <div className="text-right">
+          <Button
+            size={Size.md}
+            onClick={() => {
+              setRoomState(RoomState.entered);
+            }}
+          >
+            Enter
+          </Button>
+        </div>
       </div>
     </div>
   );
